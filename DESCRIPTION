@@ -1,0 +1,17 @@
+Package: Rfun
+Title: Arsenal of assorted R functions developed over the years
+Description: stats, data transformation, visualization
+Version: 0.1
+Author: Andrew Brooks
+Maintainer: Andrew Brooks <andrewbrooksct@gmail.com>
+Depends:
+    R (>= 3.0.2)
+License: >GPL-2
+LazyData: true
+Imports:
+    data.table
+Suggests:
+    hexbin
+Collate:
+    'Rfun-package.r'
+    'makeSQL_createTable.R'
