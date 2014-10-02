@@ -1,3 +1,5 @@
+#' generate SQL script to create table in SQL database from data.frame
+#' 
 #' Creates a sql Query that will create a table in a SQL Database from an R dataframe.
 #' It intializes with variable types (naively), but prevents the user from manually writing the query,
 #' which can be especially cumbersome when there are many columns.
@@ -7,9 +9,13 @@
 #' @param tablename (optional) name of the table we want to create in a sql database
 #' @param saveQuery (optional) name and filepath of the .sql script that will create the table.
 #' @param wordy (optional) prints the sql query out to the console.
-#' 
+#' @return sql query which the create table script
+#' @export
 #' @examples
-#' makeSQL_createTable(mtcars, saveQuery='mySQL_query.sql')
+#' \dontrun{
+#'  makeSQL_createTable(mtcars, saveQuery='mySQL_query.sql')
+#' }
+
 
 makeSQL_createTable <- function(df, tablename=deparse(substitute(df)), saveQuery=NULL, wordy=T) {
 
@@ -35,4 +41,5 @@ makeSQL_createTable <- function(df, tablename=deparse(substitute(df)), saveQuery
   
   return(sql)
 }
+
 

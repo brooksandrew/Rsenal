@@ -1,5 +1,5 @@
-Package: Rfun
-Title: Arsenal of assorted R functions developed over the years
+Package: Rsenal
+Title: Rsenal (arsenal) of assorted R functions developed over the years
 Description: stats, data transformation, visualization
 Version: 0.1
 Author: Andrew Brooks
@@ -9,9 +9,10 @@ Depends:
 License: >GPL-2
 LazyData: true
 Imports:
-    data.table
+    data.table,
+    roxygen2
 Suggests:
     hexbin
 Collate:
-    'Rfun-package.r'
+    'Rsenal-package.r'
     'makeSQL_createTable.R'
