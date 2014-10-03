@@ -1,0 +1,38 @@
+\name{mergeEdgeLists}
+\alias{mergeEdgeLists}
+\title{Merge edgelists => Master edgelist => igraph}
+\usage{
+  mergeEdgeLists(edgeLists, from = "from.ID", to = "to.ID",
+    keepDups = F)
+}
+\arguments{
+  \item{edgeLists}{list of edgelists (stored as
+  data.frames)}
+
+  \item{from}{name of the column that specifies the "from"
+  node in each data.frame in \code{edgeLists}}
+
+  \item{to}{name of the column that specifies the "to" node
+  in each data.frame in \code{edgeLists}}
+
+  \item{keepDups}{deletes duplicate from-to relations when
+  set to FALSE}
+}
+\description{
+  This function turns a list of edgelists (data.frames)
+  into a single "master" edgelist. It maintains the edge
+  attributes of each individual edge list
+}
+\examples{
+require('igraph')
+cars <- data.frame(mtcars, to=sample(rownames(mtcars), replace=T), from=sample(rownames(mtcars), replace=T))
+df1<-cars[sample(1:32,30), c('to', 'from', 'cyl', 'mpg')]
+df2<-cars[sample(1:32,15), c('to', 'from', 'cyl', 'qsec')]
+df3<-cars[sample(1:32,32), c('to', 'from', 'hp', 'drat')]
+
+df1$cyl[1:10] <- df1$cyl[1:10]+2
+el <- list(df1, df2, df3)
+
+mel <- mergeEdgeLists(el, from='from', to='to', keepDups=T)
+}
+

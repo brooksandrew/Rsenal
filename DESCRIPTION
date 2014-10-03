@@ -10,9 +10,7 @@ License: >GPL-2
 LazyData: true
 Imports:
     data.table,
-    roxygen2
+    roxygen2,
+    igraph
 Suggests:
     hexbin
-Collate:
-    'Rsenal-package.r'
-    'makeSQL_createTable.R'
