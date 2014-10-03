@@ -12,7 +12,10 @@
 #' @return sql query which the create table script
 #' @export
 #' @examples
+#'  makeSQL_createTable(mtcars)
+#'  \dontrun{
 #'  makeSQL_createTable(mtcars, saveQuery='mySQL_query.sql')
+#'  }
 
 
 makeSQL_createTable <- function(df, tablename=deparse(substitute(df)), saveQuery=NULL, wordy=T) {

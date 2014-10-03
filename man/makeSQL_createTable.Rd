@@ -31,6 +31,9 @@
   Server variable types.
 }
 \examples{
-makeSQL_createTable(mtcars, saveQuery='mySQL_query.sql')
+makeSQL_createTable(mtcars)
+ \dontrun{
+ makeSQL_createTable(mtcars, saveQuery='mySQL_query.sql')
+ }
 }
 
