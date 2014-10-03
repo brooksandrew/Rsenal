@@ -14,3 +14,9 @@ Imports:
     igraph
 Suggests:
     hexbin
+Collate:
+    'makeSQL_createTable.R'
+    'makeVertexAtt.R'
+    'mergeEdgeLists.R'
+    'quantileScore.R'
+    'rules2df.R'

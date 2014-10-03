@@ -6,7 +6,7 @@
 }
 \arguments{
   \item{rules}{list of association rules (S4 arules
-  object)}
+  object).  Output of \code{apriori} function.}
 }
 \value{
   association rules in a data.frame

@@ -1,0 +1,24 @@
+\name{quantileScore}
+\alias{quantileScore}
+\title{Quantile scoring function for continuous or integer valued data}
+\usage{
+  quantileScore(x)
+}
+\arguments{
+  \item{x}{numeric vector to scale}
+}
+\value{
+  a vector of attributes that correspond in order with the
+  nodes in your igraph
+}
+\description{
+  This function sorts a series from beginning to end.  It
+  uses each observations place in the quantile to assign it
+  a score. useful for transforming variables into the same
+  units (0-1)
+}
+\examples{
+cbind(quantileScore(mtcars$mpg), mtcars$mpg)
+cbind(quantileScore(mtcars$cyl), mtcars$cyl)
+}
+
