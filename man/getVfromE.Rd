@@ -1,0 +1,42 @@
+\name{getVfromE}
+\alias{getVfromE}
+\title{Get vertex names from edge IDs}
+\usage{
+  getVfromE(g, eid, mode = "to", unique = T)
+}
+\arguments{
+  \item{g}{igraph object to mine vertex names from}
+
+  \item{eid}{edge IDs referenced by a numeric vector or the
+  edge object themselves}
+
+  \item{mode}{"to" or "from". Indicates whether to return
+  vertex names for nodes going to (in) or from (out) from
+  the edge.}
+
+  \item{unique}{"TRUE" or "FALSE".  TRUE simply removes
+  duplicate vertex names and returns a unique list.}
+}
+\value{
+  vertex names associated with the specified edge IDs (FROM
+  or TO)
+}
+\description{
+  Returns the vertex names associated with the specified
+  edge IDs (FROM or TO)
+}
+\examples{
+require('igraph')
+
+## build sample network
+from <- c('A','A','B','B','C','C','D','D','E','E','E','F','F','H','L','L','O')
+to <- c('B','C','D','E','F','G','H','I','J','J','K','L','G','M','N','O','P')
+relations<-cbind(from,to)
+g <- graph.data.frame(relations)
+tiers <- c(1,2,3,4,1,3,4,2,1,2,3,4,0,0,1,2)
+V(g)$tier <- tiers
+
+getVfromE(g, E(g)[1:5])
+getVfromE(g, 1:5)
+}
+

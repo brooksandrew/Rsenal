@@ -1,0 +1,63 @@
+\name{smartAgg}
+\alias{smartAgg}
+\title{Aggregate multiple columns using different functions harnessing data.table efficiency}
+\usage{
+  smartAgg(df, by, ..., catN = T, printAgg = F)
+}
+\arguments{
+  \item{df}{input data.frame to be aggregated}
+
+  \item{by}{variable name of data.frame \code{df} to
+  aggregate on.  Same as \code{by} in base R
+  \code{aggregate} function}
+
+  \item{...}{method to identify the variables to aggregate
+  and the functions used to do so.  Specify the function
+  first as a string argument and then a vector of the
+  column names to aggregate using that function.  You can
+  specify as many different functions as necessary, but
+  every function must follow a vector of column names.}
+
+  \item{catN}{adds a column named "countPerBin" with the #
+  of observations aggregated in each row of the output
+  data.frame.}
+
+  \item{printAgg}{prints the line of code used to}
+}
+\value{
+  aggregated data.frame with columns corresponding to the
+  grouping variables in by followed by aggregated columns
+  from df.
+}
+\description{
+  aggregates columns of a data.frame on 1 or multiple
+  dimensions using 1 or multiple functions for different
+  columns. It is equivalent to the base R \code{aggregate}
+  function, except that it allows the user to aggregate
+  sets of columns (referred to by name or column #) with
+  different functions... and it's fast!
+}
+\examples{
+require('data.table')
+
+## establishing variables to aggregate on
+lengthVs <- c('Sepal.Length', 'Petal.Length')
+widthVs <- c('Sepal.Width', 'Petal.Width')
+
+## aggregating using 2 different functions and identifying columns to aggregate by variable names
+irisAgg1 <- smartAgg(df=iris, by='Species', 'mean', lengthVs, 'sum', widthVs)
+
+## aggregating using 2 dimensions ("Specied" and "randthing")
+iris$randthing <- as.character(sample(1:5, nrow(iris), replace=T))
+irisAgg2 <- smartAgg(df=iris, by=c('Species', 'randthing'), 'mean', lengthVs, 'sum', widthVs, catN=T, printAgg=T)
+
+## aggregating variables by column number
+irisAgg3 <- smartAgg(df=iris, by=c('Species', 'randthing'), 'mean', 1:2, 'sum', 3:4, catN=T, printAgg=T)
+
+## demonstrating speed gain of smartAgg using data.table over \\code{aggregate}
+n <- 300000
+df <- data.frame(x1=rnorm(n), x2=rbinom(n,5,0.5), x3=sample(letters, n, replace=T))
+system.time(aggFast <- smartAgg(df, by='x3', 'mean', c('x1', 'x2')))
+system.time(aggSlow <- aggregate(df[,c('x2', 'x1')], by=list(df$x3), FUN='mean'))
+}
+
