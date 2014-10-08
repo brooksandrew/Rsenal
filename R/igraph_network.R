@@ -100,10 +100,10 @@ getEfromVlist <- function(g, vlist, mode='out'){
 #' @title Prune edges of igraph
 #' @description This function takes a very connected network graph and prunes the edges down 
 #' so that it focuses on depth from the root node to the end nodes (inter-connective 
-#' edges are deleted).
-#' 1. Find all nodes 1 step out from root.  These edges must stay. 
+#' edges are deleted). \cr \cr
+#' 1. Find all nodes 1 step out from root.  These edges must stay.  \cr
 #' 2. Find all nodes 2 steps from root that have more than 2 edges in. 
-#'        Keep only one edge (the one that leads to the shortest path back to the root). 
+#'        Keep only one edge (the one that leads to the shortest path back to the root).\cr
 #' 3. Repeat for the nodes one more degree away from root.
 #' @param g igraph object
 #' @param root character string: name of root node

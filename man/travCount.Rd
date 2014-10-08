@@ -13,14 +13,16 @@
   search.  Default is -1 which searches all degrees}
 
   \item{vmode}{character string: 'out', 'in' or 'all',
-  determines how to subgraph \code{g} from \code{root}}
+  determines how to subgraph \code{g} from \code{root}.
+  Default is 'out'.}
 }
 \value{
   number: count of nodes connected to root node.
 }
 \description{
-  Simplier version of \code{\link{travOut}}.  Might be
-  faster?  Developed for a different project.
+  Count doesn't include root node.  Simplier version of
+  \code{\link{travOut}}. Might be faster?  Developed for a
+  different project.
 }
 \examples{
 require('igraph')
@@ -33,7 +35,9 @@ g <- graph.data.frame(relations)
 tiers <- c(1,2,3,4,1,3,4,2,1,2,3,4,0,0,1,2)
 V(g)$tier <- tiers
 
-prungeEdge(g, 'A')
+plot(g)
+travCount(g, 'B')
+travCount(g, 'L', vmode='out')
 }
 \seealso{
   \code{\link{travOut}}

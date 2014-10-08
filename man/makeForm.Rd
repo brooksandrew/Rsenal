@@ -1,0 +1,24 @@
+\name{makeForm}
+\alias{makeForm}
+\title{Create formula}
+\usage{
+  makeForm(y, xList)
+}
+\arguments{
+  \item{y}{character string, target variable}
+
+  \item{xList}{character vector, predictor variables (Right
+  Hand Side variables) for formula}
+}
+\value{
+  formula object
+}
+\description{
+  Creates a formula object which can be passed to many R
+  modeling functions from a vector of variable names.
+}
+\examples{
+form <- makeForm('mpg', c('drat', 'wt', 'hp'))
+summary(lm(form, data=mtcars))
+}
+
