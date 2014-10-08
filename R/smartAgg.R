@@ -12,6 +12,7 @@
 #' @param catN adds a column named "countPerBin" with the # of observations aggregated in each row of the output data.frame.
 #' @param printAgg prints the line of code used to 
 #' @return  aggregated data.frame with columns corresponding to the grouping variables in by followed by aggregated columns from df.
+#' @import data.table
 #' @export
 #' @examples
 #' 

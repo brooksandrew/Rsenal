@@ -8,6 +8,7 @@
 #' @param by.df unique key in data.frame that you will use to merge attribute into igraph
 #' @param by.g unique key in igraph that you will use to merge attribute from data.frame
 #' @return a vector of attributes that correspond in order with the nodes in your igraph
+#' @import igraph
 #' @export
 #' @examples
 #' require('igraph')

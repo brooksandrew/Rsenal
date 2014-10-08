@@ -14,8 +14,9 @@
   vertex names for nodes going to (in) or from (out) from
   the edge.}
 
-  \item{unique}{"TRUE" or "FALSE".  TRUE simply removes
-  duplicate vertex names and returns a unique list.}
+  \item{unique}{\code{TRUE} or \code{FALSE}.  TRUE simply
+  removes duplicate vertex names and returns a unique
+  list.}
 }
 \value{
   vertex names associated with the specified edge IDs (FROM
