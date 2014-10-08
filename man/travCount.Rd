@@ -9,7 +9,7 @@
 
   \item{root}{character string: name of root node}
 
-  \item{orderN}{number: # of degrees away from root node to
+  \item{orderN}{number, # of degrees away from root node to
   search.  Default is -1 which searches all degrees}
 
   \item{vmode}{character string: 'out', 'in' or 'all',
@@ -17,7 +17,7 @@
   Default is 'out'.}
 }
 \value{
-  number: count of nodes connected to root node.
+  number, count of nodes connected to root node.
 }
 \description{
   Count doesn't include root node.  Simplier version of

@@ -8,6 +8,7 @@
 #' @param mode 'out' or 'in'.  'out' returns all the vertex/node names 1 degree out from \code{vlist}. 'in' returns all 
 #'         vertex/node names directed into vlist nodes.
 #' @return vector of node names that are 1 degree away from \code{vlist}
+#' @import igraph
 #' @export
 #' @examples
 #' ## build sample network
@@ -202,14 +203,14 @@ travOut <- function(g, root, orderN=-1) {
 
 
 #' @title Count # of nodes connected to root node
-#' @description Count doesn't include root node.  Simplier version of  \code{\link{travOut}}.  
+#' @description Count doesn't include root node.  Simpler version of  \code{\link{travOut}}.  
 #' Might be faster?  Developed for a different project.
 #' @param g igraph object
 #' @param root character string: name of root node
-#' @param orderN number: # of degrees away from root node to search.  Default is -1 which searches all degrees
+#' @param orderN number, # of degrees away from root node to search.  Default is -1 which searches all degrees
 #' @param vmode character string: 'out', 'in' or 'all',  determines how to subgraph \code{g} from \code{root}. Default is 'out'.
 #' @seealso \code{\link{travOut}}
-#' @return number: count of nodes connected to root node.
+#' @return number, count of nodes connected to root node.
 #' @import igraph
 #' @export
 #' @examples
