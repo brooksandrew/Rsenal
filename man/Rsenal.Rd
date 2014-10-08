@@ -1,7 +1,6 @@
 \docType{package}
 \name{Rsenal}
 \alias{Rsenal}
-\alias{Rsenal-package}
 \title{a(R)senal of assorted R packages}
 \description{
   This is mainly a collection of random, or more accurately, clusters of random R functions

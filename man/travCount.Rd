@@ -20,7 +20,7 @@
   number, count of nodes connected to root node.
 }
 \description{
-  Count doesn't include root node.  Simplier version of
+  Count doesn't include root node.  Simpler version of
   \code{\link{travOut}}. Might be faster?  Developed for a
   different project.
 }

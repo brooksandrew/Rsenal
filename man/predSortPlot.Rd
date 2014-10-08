@@ -1,0 +1,35 @@
+\name{predSortPlot}
+\alias{predSortPlot}
+\title{Devil's Horn}
+\usage{
+  predSortPlot(pred, ytest, jitterPlot = NULL)
+}
+\arguments{
+  \item{pred}{vector of predictions for target variable on
+  test data}
+
+  \item{ytest,}{vector of the target variable from test
+  data. (0s and 1s)}
+
+  \item{jitterPlot}{\code{TRUE} or \code{FALSE}. Jitters
+  points on plot when \code{TRUE}}
+}
+\value{
+  plot
+}
+\description{
+  Visualize results of supervised model predictions on test
+  data.  Currently supports binary target variable. Red
+  dots represent observations where target variable = 1,
+  black dots where target variable = 0.
+}
+\examples{
+## Setting up some data and building a basic model on training data.
+mylogit <- glm(vs~drat+hp+mpg, family=binomial('logit'), data=mtcars[1:25,])
+mtcarsTestPred <- predict(mylogit, mtcars[26:32, ], type='response')
+predSortPlot(pred=mtcarsTestPred, ytest=mtcars$vs[26:32])
+}
+\seealso{
+  \code{\link{predQuantile}}
+}
+

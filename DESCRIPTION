@@ -11,6 +11,9 @@ LazyData: true
 Imports:
     data.table,
     roxygen2,
-    igraph
+    igraph,
+    leaps,
+    bestglm,
+    randomForest,
+    Hmisc
 Suggests:
-    hexbin
