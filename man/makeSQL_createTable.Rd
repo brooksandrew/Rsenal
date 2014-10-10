@@ -25,8 +25,9 @@ which can be especially cumbersome when there are many columns.
 Initialized with basic SQL Server variable types.
 }
 \examples{
-\dontrun{
+makeSQL_createTable(mtcars)
+ \dontrun{
  makeSQL_createTable(mtcars, saveQuery='mySQL_query.sql')
-}
+ }
 }
 

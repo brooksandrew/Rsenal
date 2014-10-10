@@ -1,0 +1,45 @@
+\name{makeVertexAtt}
+\alias{makeVertexAtt}
+\title{merge data.frame attributes to an igraph (network) object}
+\usage{
+  makeVertexAtt(g, df, vname, by.df, by.g = "name")
+}
+\arguments{
+  \item{g}{igraph object to which you want to add a
+  node/vertex attribute}
+
+  \item{df}{data.frame containing the attribute you want to
+  add to igraph}
+
+  \item{vname}{name of column in data.frame \code{df} that
+  you will merge into igraph}
+
+  \item{by.df}{unique key in data.frame that you will use
+  to merge attribute into igraph}
+
+  \item{by.g}{unique key in igraph that you will use to
+  merge attribute from data.frame}
+}
+\value{
+  a vector of attributes that correspond in order with the
+  nodes in your igraph
+}
+\description{
+  Enriches an igraph object with node/vertex attributes
+  from a data.frame
+}
+\examples{
+require('igraph')
+actors <- data.frame(names=c("Alice", "Bob", "Cecil", "David","Esmeralda"),
+age=c(48,33,45,34,21),
+gender=c("F","M","F","M","F"))
+relations <- data.frame(from=c("Bob", "Cecil", "Cecil", "David",
+                              "David", "Esmeralda"),
+                       to=c("Alice", "Bob", "Alice", "Alice", "Bob", "Alice"),
+                       same.dept=c(FALSE,FALSE,TRUE,FALSE,FALSE,TRUE),
+                       friendship=c(4,5,5,2,1,1), advice=c(4,5,5,4,2,3))
+g <- igraph::graph.edgelist(as.matrix(relations[,c('from', 'to')]), directed=T)
+
+V(g)$age <- makeVertexAtt(g, df=actors, vname='age', by.df='names', by.g='name')
+}
+

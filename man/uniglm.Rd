@@ -1,0 +1,48 @@
+\name{uniglm}
+\alias{uniglm}
+\title{Univariate glm regression}
+\usage{
+  uniglm(df, yv, xv, file = NULL, sortby = "aic",
+    xvlab = NULL, test = T)
+}
+\arguments{
+  \item{df}{data.frame with variables for analysis}
+
+  \item{yv}{character string, target variable}
+
+  \item{xv}{character vector, predictor variables to test
+  univariately}
+
+  \item{file}{character string, filepath to write results
+  out to.  txt or csv file.}
+
+  \item{sortby}{character string, criteria to sort
+  variables by. Default = 'aic'}
+
+  \item{xvlab}{data.frame, lookup table for variable names.
+  First column is codename, second column is the pretty
+  printed name.}
+
+  \item{test}{\code{TRUE} or \code{FALSE}.  Includes Chi
+  square test, or not.}
+}
+\value{
+  data.frame of results
+}
+\description{
+  Runs a univariate logistic regression on each predictor
+  variable of interest.
+}
+\examples{
+require('Hmisc')
+
+##setting up some data
+longnames <- data.frame(long = c('Weight', 'Miles Per Gallon', 'Cylinder', 'D.R.A.T', 'Horsepower', 'A.M.'),
+short = c('wt', 'mpg', 'cyl', 'drat', 'hp', 'am'), stringsAsFactors=F)
+
+glm.out <- uniglm(df=mtcars, yv='vs', xv=c('hp','drat','cyl','mpg','wt'), xvlab=longnames)
+}
+\seealso{
+  \code{\link{bestglm}}, \code{\link{leaps}}
+}
+

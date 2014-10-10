@@ -1,0 +1,46 @@
+\name{optimizeModelWeight}
+\alias{optimizeModelWeight}
+\title{Optimize weight on ensemble of 2 supervised models}
+\usage{
+  optimizeModelWeight(pred1, pred2, actual, steps = 50,
+    cutoff = 0.5)
+}
+\arguments{
+  \item{pred1}{numeric vector of probabilities, prediction
+  from model 1}
+
+  \item{pred2}{numeric vector of probabilities, prediction
+  from model 2}
+
+  \item{actual}{vector of 1s and 0s.  The target variable
+  test data}
+
+  \item{steps}{number, high numbers compute a more
+  exhaustive combination of model weights}
+
+  \item{cutoff}{Cutoff used to demarcate predictions into
+  positive or negative class.}
+
+  \item{ytest,}{vector of the target variable from test
+  data. (0s and 1s)}
+
+  \item{jitterPlot}{\code{TRUE} or \code{FALSE}. Jitters
+  points on plot when \code{TRUE}}
+}
+\value{
+  data.frame of results
+}
+\description{
+  This function creates a weighted average of predictions
+  from two models and evaluates F1, precision, recall, auc
+  or c for each combination of the models to determine the
+  best weights for each.
+}
+\examples{
+require('Hmisc')
+fit_glm1 <- glm(am~cyl, data=mtcars, family=binomial(logit))
+fit_glm2 <- glm(am~disp, data=mtcars, family=binomial(logit))
+ow <- optimizeModelWeight(fit_glm1$fitted.values, fit_glm2$fitted.values, actual=fit_glm1$model$am)
+plot(ow$weights, ow$precision, type='l', xlab='weight on model 1')
+}
+
