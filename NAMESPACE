@@ -1,3 +1,4 @@
+export(arulesApp)
 export(balPanel)
 export(editForm)
 export(getEfromVlist)

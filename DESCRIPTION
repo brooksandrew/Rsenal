@@ -19,6 +19,7 @@ Imports:
     shiny,
     ggplot2,
     arulesViz,
+    arules,
     vcd,
     RColorBrewer,
     fmsb,
