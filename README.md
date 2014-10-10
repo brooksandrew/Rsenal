@@ -15,7 +15,7 @@ Current clusters of functionality:
 
 `install.packages('devtools') # if devtools not already installed`  
 `require('devtools') `  
-`install_gitub('brooksandrew/Rsenal')`  
+`install_github('brooksandrew/Rsenal')`  
 `require('Rsenal')`
 
 That's it, you got it.

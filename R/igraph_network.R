@@ -54,8 +54,8 @@ getV1fromVlist <- function(g, vlist, mode='out'){
 #' tiers <- c(1,2,3,4,1,3,4,2,1,2,3,4,0,0,1,2)
 #' V(g)$tier <- tiers
 #'
-#'getVfromE(g, E(g)[1:5])
-#'getVfromE(g, 1:5)
+#' getVfromE(g, E(g)[1:5])
+#' getVfromE(g, 1:5)
 
 getVfromE <- function(g, eid, mode='to', unique=T) {
   eid <- unique(eid[!is.na(eid)])
