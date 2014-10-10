@@ -15,5 +15,12 @@ Imports:
     leaps,
     bestglm,
     randomForest,
-    Hmisc
+    Hmisc,
+    shiny,
+    ggplot2,
+    arulesViz,
+    vcd,
+    RColorBrewer,
+    fmsb,
+    MASS
 Suggests:
