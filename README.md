@@ -13,10 +13,10 @@ Current clusters of functionality:
 
 ### How to download
 
-`install.packages('devtools') # if devtools not already installed`  
-`require('devtools') `  
-`install_gitub('brooksandrew/Rsenal')`  
-`require('Rsenal')`  
+`install.packages('devtools') # if devtools not already installed  
+require('devtools')  
+install_gitub('brooksandrew/Rsenal')  
+require('Rsenal')`  
 
 That's it, you got it.
 
