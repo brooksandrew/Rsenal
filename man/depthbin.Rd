@@ -1,0 +1,45 @@
+\name{depthbin}
+\alias{depthbin}
+\title{Equal depth binning}
+\usage{
+  depthbin(ser, nbins = 10, qtype = 7, digits = 10)
+}
+\arguments{
+  \item{ser}{numeric vector to bin}
+
+  \item{nbins}{number of bins desired}
+
+  \item{qtype}{an integer between 1 and 9 selecting one of
+  the nine quantile algorithms detailed below to be used.
+  See \code{\link{quantile}} for more details.  Default is
+  7.}
+
+  \item{digits}{number, number of digits to display in bin
+  categories}
+}
+\value{
+  ordered factor vector with bins
+}
+\description{
+  Simple equal depth binning algorithm.
+}
+\examples{
+## perfect equal depth bins
+x1 <- rnorm(1000, 0, 20)
+binned1 <- depthbin(x1, nbins=10)
+table(binned1)
+
+## slightly uneven bins with integer data
+x2 <- rpois(1000, 3)
+binned2 <- depthbin(x2, nbins=5)
+summary(binned2)
+
+## as good as we can get with skewed integer data
+x3 <- round(abs(log(abs(rnorm(1000)))))
+binned3 <- depthbin(x3, nbins=5)
+summary(binned3)
+}
+\seealso{
+  \code{\link{quantile}}
+}
+

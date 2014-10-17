@@ -9,7 +9,7 @@
 #' @param bin logical, \code{TRUE} will automatically discretize/bin numerical data into categorical features that can be used for association analysis.
 #' @seealso \code{arulesViz}, \code{arules}
 #' @return Shiny App
-#' @import shiny, arulesViz, arules
+#' @import shiny arulesViz arules
 #' @export
 #' 
 #' @examples
