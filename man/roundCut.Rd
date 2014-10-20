@@ -11,7 +11,7 @@
   how many decimals to display}
 }
 \value{
-  character vector with length of input vector.
+  formatted character vector with length of input vector.
 }
 \description{
   Formats an interval of form \code{(5.234,11.783]} to
@@ -21,6 +21,10 @@
   closed with \code{(} and \code{[} respectively and are
   maintained as such when formatted.  Useful for
   prettifying graphs and reports.
+}
+\examples{
+x1 <- cut(quantile(rnorm(100)), breaks=4)
+roundCut(x1, 1)
 }
 \seealso{
   \code{\link{depthbin}}

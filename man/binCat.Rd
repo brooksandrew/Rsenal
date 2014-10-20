@@ -1,0 +1,48 @@
+\name{binCat}
+\alias{binCat}
+\title{categorical data binning by collapsing}
+\usage{
+  binCat(x, ncat = NULL, maxp = NULL, results = F)
+}
+\arguments{
+  \item{x}{vector to bin.  It is transformed to a
+  character, so any type is acceptable}
+
+  \item{ncat}{number 0 to 100 (or higher I suppose).
+  Number of bins to collapse data to}
+
+  \item{maxp}{number 0 to 1.  Percentage of data that will
+  be represented "as is" before categories are collapsed to
+  "other"}
+
+  \item{results}{logical \code{TRUE} or \code{FALSE}.
+  Prints a frequency table of the new categories.}
+}
+\description{
+  Bins categorical variables into a smaller number of bins.
+  Useful when modeling with variables that have many small
+  categories. The largest categories are taken as is and
+  the smaller categories are collapsed into a new field
+  named 'other.' There are two options for determining the
+  number of bins: \cr 1. Specify the exact number of bins
+  desired (\code{ncat}) \cr 2. Specify how the share of
+  your variable that will be represented with actual
+  categories before naming everything else 'other'
+  (\code{maxp}) \cr
+}
+\details{
+  It is advisable to use only the \code{ncat} OR
+  \code{maxp} parameters.  When both used together, they
+  will return whichever criteria yields the smaller number
+  of bins.
+}
+\examples{
+d <- rpois(1000, 20)
+d[d>26] <- sample(1:26, length(d[d>26]), replace=T)
+dl <- letters[d]
+barplot(table(dl))
+table(binCat(dl, results=F, ncat=5))
+table(binCat(dl, results=F, maxp=0.5))
+table(binCat(dl, results=F, maxp=0.9))
+}
+

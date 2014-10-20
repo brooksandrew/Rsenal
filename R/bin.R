@@ -72,10 +72,18 @@ roundCut <- function(x, r=1){
 }
 
 #' @title categorical data binning by collapsing
-#' @description 
+#' @description Bins categorical variables into a smaller number of bins.  Useful when modeling with variables that have many small categories.
+#' The largest categories are taken as is and the smaller categories are collapsed into a new field named 'other.'
+#' There are two options for determining the number of bins: \cr 
+#' 1. Specify the exact number of bins desired (\code{ncat}) \cr
+#' 2. Specify how the share of your variable that will be represented with actual categories before naming everything else 'other' (\code{maxp}) \cr
+#' @details It is advisable to use only the \code{ncat} OR \code{maxp} parameters.  When both used together, they will return whichever 
+#' criteria yields the smaller number of bins.
 #' 
-#' @param x character vector of bins to format
-#' @param r number, 0 to 10 (or higher I suppose) indicating how many decimals to display
+#' @param x vector to bin.  It is transformed to a character, so any type is acceptable
+#' @param ncat number 0 to 100 (or higher I suppose).  Number of bins to collapse data to
+#' @param maxp number 0 to 1.  Percentage of data that will be represented "as is" before categories are collapsed to "other"
+#' @param results logical \code{TRUE} or \code{FALSE}.  Prints a frequency table of the new categories.
 
 #' @examples
 #' d <- rpois(1000, 20)
@@ -111,8 +119,6 @@ binCat <- function(x, ncat=NULL, maxp=NULL, results=F) {
   return(returnser)  
 }
   
-  
-
 
 
 

@@ -32,12 +32,11 @@
 #' arulesApp(d)
 
 arulesApp <- function (dataset, bin=T) {
-  ## Loading data here  
   
-  ## bin data if numeric 
-
-  ## End load data
-  
+  ## binning numeric data
+  for(i in 1:ncol(dataset)) {
+    if(class(dataset[,i]) %in% c('numeric', 'integer')) dataset[,i] <- depthbin(dataset[,i], nbins=10)
+  }
   
   ## calling Shiny App
   shinyApp(ui = shinyUI(pageWithSidebar(
