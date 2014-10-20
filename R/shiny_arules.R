@@ -1,5 +1,5 @@
 #' @title Assocation Rules Visualization Shiny App
-#' @description Launches a Shiny App that provides an interative interface to the visualizations of the \code{arulesViz} package.
+#' @description Launches a Shiny App that provides an interactive interface to the visualizations of the \code{arulesViz} package.
 #' The app allows users to mine rules based on all or just subsets of features, sort by criteria (lift, support, confidence) and visualize
 #' using network graph, grouped bubble and scatter plots. \cr
 #' Users filter rules to target only those with a certain variable on the RHS or LHS of the rule.
