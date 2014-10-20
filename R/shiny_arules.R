@@ -66,7 +66,7 @@ arulesApp <- function (dataset, bin=T) {
       ),
       
       conditionalPanel(
-        condition = "input.mytab %in%' c('grouped', 'graph', 'table', 'scatter')", 
+        condition = "input.mytab %in%' c('grouped', 'graph', 'table', 'datatable', 'scatter')", 
         radioButtons('samp', label='Sample', choices=c('All Rules', 'Sample')), br(),
         uiOutput("choose_columns"), br(),
         sliderInput("supp", "Support:", min = 0, max = 1, value = 0.1 , step = 1/10000), br(),
@@ -75,7 +75,8 @@ arulesApp <- function (dataset, bin=T) {
         numericInput("minL", "Min. items per set:", 2), br(), 
         numericInput("maxL", "Max. items per set::", 10), br(),
         radioButtons('lhsv', label='LHS variables', choices=c('All', 'Subset')), br(),
-        radioButtons('rhsv', label='RHS variables', choices=c('All', 'Subset')), br()
+        radioButtons('rhsv', label='RHS variables', choices=c('All', 'Subset')), br(),
+        downloadButton('downloadData', 'Download Rules as CSV')
       )
       
     ),
@@ -85,7 +86,8 @@ arulesApp <- function (dataset, bin=T) {
                   tabPanel('Grouped', value='grouped', plotOutput("groupedPlot", width='100%', height='100%')),
                   tabPanel('Graph', value='graph', plotOutput("graphPlot", width='100%', height='100%')),
                   tabPanel('Scatter', value='scatter', plotOutput("scatterPlot", width='100%', height='100%')),
-                  tabPanel('Table', value='table', verbatimTextOutput("rulesTable"))
+                  tabPanel('Table', value='table', verbatimTextOutput("rulesTable")),
+                  tabPanel('Data Table', value='datatable', dataTableOutput("rulesDataTable"))
       )
     )
     
@@ -161,12 +163,28 @@ arulesApp <- function (dataset, bin=T) {
        plot(sort(ar, by=input$sort)[1:nR()], method='scatterplot')
      }, height=800, width=800)
      
+     ## Rules Data Table ##########################
+     output$rulesDataTable <- renderDataTable({
+       ar <- rules()
+       rulesdt <- rules2df(ar)
+       rulesdt
+     })
+     
      ## Rules Printed ########################
      output$rulesTable <- renderPrint({
        #hack to disply results... make sure this match line above!!
        ar <- apriori(dataset[,input$cols], parameter=list(support=input$supp, confidence=input$conf, minlen=input$minL, maxlen=input$maxL))
        inspect(sort(rules(), by=input$sort))
-     })     
+     })
+     
+     ## Download data to csv ########################
+     output$downloadData <- downloadHandler(
+       filename = 'arules_data.csv',
+       content = function(file) {
+         write.csv(rules2df(rules()), file)
+       }
+     )
+     
      
    }
   )
