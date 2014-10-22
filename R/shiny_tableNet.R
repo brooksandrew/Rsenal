@@ -1,5 +1,75 @@
 tableNet <- function(dfL) {
   
+  ###############################################################################
+  ## takes list of Data frames and makes igraph network  ########################
+  ###############################################################################
+  dfL2network <- function(dfL, islands=T){
+    # create adjacency list
+    edgeL <- data.frame(v1=as.character(), v2=as.character(), v3=as.character(), stringsAsFactors=F)
+    k<-1
+    for(i in 1:length(dfL)){
+      for(j in 1:length(dfL)){
+        commonv <- intersect(names(dfL[[i]]), names(dfL[[j]]))
+        if(length(commonv)>0){
+          for(cv in 1:length(commonv)){
+            edgeL[k,1] <- names(dfL)[i]
+            edgeL[k,2] <- names(dfL)[j]
+            edgeL[k,3] <- commonv[cv]
+            k<-k+1
+          }
+        }    
+      }
+    }
+    
+    ## creating graph from adjacency
+    edgeL <- edgeL[edgeL[,1]!=edgeL[,2],]
+    g <- graph.data.frame(edgeL[,c(1,2)], directed=F)
+    if(islands==T) {
+      xvars <- unlist(lapply(dfL, names),use.names=F)
+      keys <- unique(xvars[duplicated(xvars)==T])
+      islandtab <- names(dfL)[sapply(dfL, function(x) is.na(sum(names(x) %in% keys)))]
+      g <- g + vertices(islandtab)
+    }
+    E(g)$color <- 'gray'
+    E(g)$name <- edgeL[,3]
+    
+    return(g)
+  }
+  
+  #######################################################
+  ## DETERMINES STRENGTH OF KEYS ########################
+  ## using memoise to hash results ######################
+  #######################################################
+  isKey <- memoise(function(dfL, xvar) {
+    
+    tabNames <- lapply(dfL, names)
+    tabs <- names(which(lapply(tabNames, function(x) xvar %in% x)==T))
+    mat <- matrix(nrow=length(tabs), ncol=length(tabs))
+    ii <- 1; 
+    for(i in tabs){
+      iivar <- dfL[[i]][,xvar]
+      jj <- 1
+      for(j in tabs){
+        jjvar <- dfL[[j]][,xvar]
+        stop
+        mat[jj,ii] <- sum(jjvar %in% iivar)/length(jjvar)
+        jj<-jj+1
+      }
+      ii<-ii+1
+    }
+    
+    mat[is.na(mat)] <- 0
+    colnames(mat) <- tabs
+    rownames(mat) <- tabs
+    return(mat)
+  })
+  
+  g <- dfL2network(dfL)
+  
+  
+  #######################################################
+  ## ACTUALLY RUN APP ###################################
+  #######################################################
   
   shinyApp(ui = shinyUI(pageWithSidebar(
     
@@ -30,7 +100,7 @@ tableNet <- function(dfL) {
       ## STRENGTH TABLE
       conditionalPanel(
         condition="input.mytab=='strength'",
-        checkboxInput(inputId='keyList', label='Optional: Use pre-computed key strength matrix', value=TRUE),
+        checkboxInput(inputId='keyList', label='Optional: Use pre-computed key strength matrix', value=FALSE),
         
         conditionalPanel("input.keyList==true",
                          selectInput(inputId='keyListObject', label='Pick pre-computed key strength matrix object', choices=ls(name='.GlobalEnv')) 
@@ -40,7 +110,6 @@ tableNet <- function(dfL) {
         sliderInput("keylab", "Variable labels size", value=1, min=0.1, max=10, step=0.1)
      
       ),
-      
       
       
       ## KEY-TABLE HEATMAP
@@ -118,9 +187,9 @@ tableNet <- function(dfL) {
         namesL <- lapply(dfL, names)
         keysInTab <- unlist(lapply(namesL, function(x) sum((x %in% commonv)==T)))
         keysInTab[is.na(keysInTab)] <- 0
-        dfn <<- data.frame(keysInTab)
-        dfn$vnames <<- row.names(dfn)
-        V(g)$nkeys <- as.numeric(makeVA(g, df='dfn', id='vnames', att='keysInTab'))
+        dfn <- data.frame(keysInTab)
+        dfn$vnames <- row.names(dfn)
+        V(g)$nkeys <- as.numeric(makeVertexAtt(g, df=dfn, vname='keysInTab', by.df='vnames', by.g='name'))
         vcolPal <- colorRampPalette(c("white", "purple"))(n = max(V(g)$nkeys)+1)
         V(g)$color <- vcolPal[V(g)$nkeys+1]
         
@@ -145,14 +214,14 @@ tableNet <- function(dfL) {
     output$strengthPlot <- renderPlot({
       
       ## defining keyL object
-      if(input$keyList==TRUE) {keyL <- get(input$keyListObject)
+      if(input$keyList==TRUE) {keyL <- get(input$keyListObject)[[input$key]]
       } else {
-        keyL <- sapply(commonv, function(x) isKey(dfL, x))
+        keyL <- isKey(dfL, input$key)
       }
 
-      myPalette <- colorRampPalette(c("white", "firebrick"))(n = 20)
-      checklab <- round(keyL[[input$key]],2)
-      heatmap.2(keyL[[input$key]], trace='none', dendrogram='none', Rowv=F, Colv=F, margins=c(18,18), col=myPalette, 
+      myPalette <- colorRampPalette(c("white", "firebrick"))(n=20)
+      checklab <- round(keyL,2)
+      heatmap.2(keyL, trace='none', dendrogram='none', Rowv=F, Colv=F, margins=c(18,18), col=myPalette, 
                 cellnote=checklab, notecol='black', na.rm=T, cexRow=input$keylab, cexCol=input$keylab)
       text(x=.5, y=.9, '1. Take unique values of the \n key variable in each table. \n
            2. Look at the share of these unique \n values from table 1 (right) \n that appear in table 2 (bottom) \n
@@ -175,7 +244,7 @@ tableNet <- function(dfL) {
       tabv <- names(dfL)
       mat <- matrix(nrow=length(commonv), ncol=length(tabv))
       colnames(mat) <- tabv
-      k <- lapply(keyL, rownames)
+      k <- commonv #lapply(keyL, rownames)
       rownames(mat) <- names(k)
       
       for(i in 1:length(k)) {
