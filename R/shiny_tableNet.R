@@ -1,4 +1,4 @@
-tableNet <- function(dfL, keyL) {
+tableNet <- function(dfL) {
   
   
   shinyApp(ui = shinyUI(pageWithSidebar(
@@ -11,23 +11,13 @@ tableNet <- function(dfL, keyL) {
         condition="input.mytab=='network'",
         
         sliderInput("vlabcex", "Vertex label size:", value=1, min=.05, max=5, step=0.05),
-        
         sliderInput("sizeNodesSlider", "Vertex size", value=10, min=0.1, max=30, step=0.1),
-        
         sliderInput("ewidth", "Edge width:", value=1, min=1, max=10, step=1),
-        
-        selectInput("lay2", "Choose a layout", 
-                    choices = c('circle', 'fruchterman.reingold')),
-        
-        selectInput("vcolor", "Color vertices by:", 
-                    choices = c('# of keys', '# of connections', 'strength of keys')),
-        
+        selectInput("lay2", "Choose a layout", choices = c('circle', 'fruchterman.reingold')),
+        selectInput("vcolor", "Color vertices by:", choices = c('# of keys', '# of connections', 'strength of keys')),
         checkboxInput(inputId='sizeNodes', label='Size vertices by connections', value=T),
-        
         checkboxInput(inputId='curved', label='Curve edges', value=F),
-        
         checkboxInput(inputId='islands', label='Remove unconnected Tables', value=T),
-        
         radioButtons(inputId='subEdges', label='Select Edges:', choices=c('all', 'some')),
         
         conditionalPanel("input.subEdges=='some'",
@@ -40,38 +30,26 @@ tableNet <- function(dfL, keyL) {
       ## STRENGTH TABLE
       conditionalPanel(
         condition="input.mytab=='strength'",
+        checkboxInput(inputId='keyList', label='Optional: Use pre-computed key strength matrix', value=TRUE),
+        
+        conditionalPanel("input.keyList==true",
+                         selectInput(inputId='keyListObject', label='Pick pre-computed key strength matrix object', choices=ls(name='.GlobalEnv')) 
+        ),
+        
         selectInput(inputId='key', label='Choose a key', choices=sort(unique(E(g)$name))),
-        sliderInput("keylab", 
-                    "Variable labels", value=1, min=0.1, max=10, step=0.1)
+        sliderInput("keylab", "Variable labels size", value=1, min=0.1, max=10, step=0.1)
+     
       ),
+      
+      
       
       ## KEY-TABLE HEATMAP
       conditionalPanel(
         condition="input.mytab=='keyTab'",
-        sliderInput("colLabCex", 
-                    "Table Label Size", 
-                    value = 1,
-                    min = .1, 
-                    max = 10,
-                    step = .1),
-        sliderInput("rowLabCex", 
-                    "Key Label Size", 
-                    value = 1,
-                    min = .1, 
-                    max = 10,
-                    step = .1),
-        sliderInput("marginSize", 
-                    "Margin Size", 
-                    value = 15,
-                    min = 0, 
-                    max = 100,
-                    step = 1),
-        sliderInput("test", 
-                    "width size", 
-                    value = 800,
-                    min = 0, 
-                    max = 5000,
-                    step = 50)
+        sliderInput("colLabCex", "Table Label Size", value=1, min=0.1, max=10, step=0.1),
+        sliderInput("rowLabCex", "Key Label Size", value=1, min=.1, max=10, step=.1),
+        sliderInput("marginSize", "Margin Size", value=15, min=0, max=100, step=1),
+        sliderInput("wsize", "width size", value=800, min=0, max=5000, step=50)
       ),
       
       ## TABLE VIEW 
@@ -79,10 +57,10 @@ tableNet <- function(dfL, keyL) {
         condition="input.mytab=='adjlist'",
         
         selectInput("tab", "Choose a Table", 
-                    choices = c('all', unique(V(g)$name))),
+                    choices=c('all', unique(V(g)$name))),
         
         selectInput("edgev", "Choose a Variable", 
-                    choices = c('all', unique(E(g)$name)))
+                    choices=c('all', unique(E(g)$name)))
       )
     ),
     
@@ -163,7 +141,15 @@ tableNet <- function(dfL, keyL) {
     ## STRENGTH CHART 
     ################################################
     
+    
     output$strengthPlot <- renderPlot({
+      
+      ## defining keyL object
+      if(input$keyList==TRUE) {keyL <- get(input$keyListObject)
+      } else {
+        keyL <- sapply(commonv, function(x) isKey(dfL, x))
+      }
+
       myPalette <- colorRampPalette(c("white", "firebrick"))(n = 20)
       checklab <- round(keyL[[input$key]],2)
       heatmap.2(keyL[[input$key]], trace='none', dendrogram='none', Rowv=F, Colv=F, margins=c(18,18), col=myPalette, 
@@ -181,7 +167,7 @@ tableNet <- function(dfL, keyL) {
     ################################################
     
     plotSize <- reactive({
-      return(input$test)
+      return(input$wsize)
     })
     
     output$keyTabMat <- renderPlot({
