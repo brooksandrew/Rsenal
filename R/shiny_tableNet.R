@@ -80,7 +80,7 @@ tableNet <- function(dfL) {
         
         conditionalPanel("input.subEdges=='some'",
                          checkboxInput(inputId='delE', label='Delete un-selected edges', value=F),
-                         checkboxGroupInput(inputId='edgev', label='Variables', choices=sort(unique(E(g)$name)))
+                         selectInput(inputId='edgev', label='Variables', choices=sort(unique(E(g)$name)), multiple=T)
         )
         
       ),
@@ -109,16 +109,13 @@ tableNet <- function(dfL) {
         sliderInput("wsize", "width size", value=800, min=0, max=5000, step=50)
       ),
       
-      ## TABLE VIEW 
+      ## ADJACENCY LIST
       conditionalPanel(
         condition="input.mytab=='adjlist'",
-        
-        selectInput("tab", "Choose a Table", 
-                    choices=c('all', unique(V(g)$name))),
-        
-        selectInput("edgev", "Choose a Variable", 
-                    choices=c('all', unique(E(g)$name)))
+        selectInput(inputId='adjcommonvar', label='Choose a key', choices=sort(unique(E(g)$name)), multiple=T)
       )
+
+      
     ),
     
     ## PANELS TO SHOW
@@ -127,7 +124,7 @@ tableNet <- function(dfL) {
                   tabPanel('Network', value='network', plotOutput('circle', height='150%')),
                   tabPanel('Key Strength', value='strength', plotOutput('strengthPlot', height='150%')),
                   tabPanel('Key-Table Matrix', value='keyTab', plotOutput('keyTabMat', height='150%')),
-                  tabPanel('Adjacency List', value='adjlist', dataTableOutput('adjlist'))
+                  tabPanel('Adjacency List', value='adjlist', dataTableOutput('adjlisttab'))
       )
     )
     
@@ -157,10 +154,14 @@ tableNet <- function(dfL) {
         g <- delete.vertices(g, v=islandTabs)
       }
       
+      ## setting defaul graphic parameters
+      E(g)$width <- input$ewidth
+      E(g)$color <- 'gray'
+      
       ## edge colors
       if(input$subEdges=='some'){
-        E(g)$color <- 'gray'
         E(g)$color[E(g)$name %in% input$edgev] <- 'red'
+        E(g)$width[E(g)$name %in% input$edgev] <- input$ewidth + 3
       }
       
       ## vertex size
@@ -190,14 +191,13 @@ tableNet <- function(dfL) {
       lay <- get(paste('layout.', as.character(input$lay2), sep=''))  
       
       ## ACTUALLY PLOTTING NETWORK
-      plot(g, vertex.label.cex=input$vlabcex, layout=lay, edge.curved=input$curved, vertex.label.color='black', 
-           edge.width=input$ewidth)
+      plot(g, vertex.label.cex=input$vlabcex, layout=lay, edge.curved=input$curved, vertex.label.color='black') 
     }, width=800, height=800)
+    
     
     ################################################
     ## STRENGTH CHART 
     ################################################
-    
     
     output$strengthPlot <- renderPlot({
       
@@ -213,7 +213,7 @@ tableNet <- function(dfL) {
                 cellnote=checklab, notecol='black', na.rm=T, cexRow=input$keylab, cexCol=input$keylab)
       text(x=.5, y=.9, '1. Take unique values of the \n key variable in each table. \n
            2. Look at the share of these unique \n values from table 1 (right) \n that appear in table 2 (bottom) \n
-           3. So variables with high row scores are strong keys'
+           3. So variables with high row scores are strong keys \n'
            , cex=1.2)
       
     }, width=800, height=800)
@@ -251,19 +251,13 @@ tableNet <- function(dfL) {
     
     ################################################
     ## ADJACENCY LIST
-    ################################################
-    adjdf <- reactive({
+    ################################################    
+    output$adjlisttab <- renderDataTable({
       df <- get.data.frame(g)[,c('from', 'to', 'name')]
-      #names(df) <- c('table1', 'table2', 'commonVariable')
-      #df[(df$table1 == input$tab | df$table2 == input$tab) ,]
-      return(df)
+      names(df) <- c('table1', 'table2', 'commonVariable')
+      if(length(input$adjcommonvar)>0) df <- df[df$commonVariable %in% input$adjcommonvar,]
+      df
     })
-    
-    output$adjlist <- renderDataTable({
-      adjdf()
-    })
-    
-    
     
   }
   )
