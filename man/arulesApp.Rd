@@ -17,7 +17,7 @@
   Shiny App
 }
 \description{
-  Launches a Shiny App that provides an interative
+  Launches a Shiny App that provides an interactive
   interface to the visualizations of the \code{arulesViz}
   package. The app allows users to mine rules based on all
   or just subsets of features, sort by criteria (lift,

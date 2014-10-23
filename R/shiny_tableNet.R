@@ -1,3 +1,19 @@
+#' @title Shiny app to visualize schema of relational tables
+#' @description Launches a Shiny App that provides a visual representation of the relationships between a collection of tables 
+#' (data.frames) with some relational structure.  If given a dump of dozens of flat files and without a formal schema or 
+#' documentation on your data, this app will help explore and understand the underlying schema - which tables can be joined
+#' which other tables, which variables can be used to join which tables, etc,  It also gives a read on how strongly each variable with 
+#' the same name in multiple tables actually connects tables (how many of the values of the linking variable \code{x} that are in
+#' \code{table1} are also in \code{table2}.  \cr \cr
+#' @details Note, the Key-strength tables can be slow to display because these computations actually dive into the contents of the 
+#' data.frames and perform set operations on every row of the variable of interest.  It is possible to use the \code{\link{isKey}} function
+#' to compute these similarity matrices ahead of time to prevent the Shiny app from doing these computations each time.
+#' @param dfL list of data.frames used to generate schema.  This is easily generated from \code{\link{dir2dfList}}
+#' @seealso \code{dir2dfList} \code{isKey}
+#' @return Shiny App
+#' @import memoise shiny gplots igraph
+#' @export
+
 tableNet <- function(dfL) {
   
   ###############################################################################
@@ -35,38 +51,10 @@ tableNet <- function(dfL) {
     
     return(g)
   }
-  
-  #######################################################
-  ## DETERMINES STRENGTH OF KEYS ########################
-  ## using memoise to hash results ######################
-  #######################################################
-  isKey <- memoise(function(dfL, xvar) {
-    
-    tabNames <- lapply(dfL, names)
-    tabs <- names(which(lapply(tabNames, function(x) xvar %in% x)==T))
-    mat <- matrix(nrow=length(tabs), ncol=length(tabs))
-    ii <- 1; 
-    for(i in tabs){
-      iivar <- dfL[[i]][,xvar]
-      jj <- 1
-      for(j in tabs){
-        jjvar <- dfL[[j]][,xvar]
-        stop
-        mat[jj,ii] <- sum(jjvar %in% iivar)/length(jjvar)
-        jj<-jj+1
-      }
-      ii<-ii+1
-    }
-    
-    mat[is.na(mat)] <- 0
-    colnames(mat) <- tabs
-    rownames(mat) <- tabs
-    return(mat)
-  })
-  
+ 
+  ## create schema network graph
   g <- dfL2network(dfL)
-  
-  
+    
   #######################################################
   ## ACTUALLY RUN APP ###################################
   #######################################################
@@ -139,7 +127,7 @@ tableNet <- function(dfL) {
                   tabPanel('Network', value='network', plotOutput('circle', height='150%')),
                   tabPanel('Key Strength', value='strength', plotOutput('strengthPlot', height='150%')),
                   tabPanel('Key-Table Matrix', value='keyTab', plotOutput('keyTabMat', height='150%')),
-                  tabPanel('Adjacency List', value='adjlist', tableOutput('adjlist'))
+                  tabPanel('Adjacency List', value='adjlist', dataTableOutput('adjlist'))
       )
     )
     
@@ -244,12 +232,11 @@ tableNet <- function(dfL) {
       tabv <- names(dfL)
       mat <- matrix(nrow=length(commonv), ncol=length(tabv))
       colnames(mat) <- tabv
-      k <- commonv #lapply(keyL, rownames)
-      rownames(mat) <- names(k)
+      rownames(mat) <- commonv
       
-      for(i in 1:length(k)) {
-        indx <- match(k[[i]], colnames(mat))
-        mat[i,indx] <- 1
+      for(i in 1:nrow(mat)){
+        colindx <- which(sapply(lapply(dfL, names), function(x) rownames(mat)[i] %in% x))
+        mat[i, colindx] <- 1
       }
       mat[is.na(mat)] <- 0
       mat <- mat[rev(order(rowSums(mat))),]
@@ -266,13 +253,13 @@ tableNet <- function(dfL) {
     ## ADJACENCY LIST
     ################################################
     adjdf <- reactive({
-      df <- get.data.frame(g)[,1:3]
+      df <- get.data.frame(g)[,c('from', 'to', 'name')]
       #names(df) <- c('table1', 'table2', 'commonVariable')
       #df[(df$table1 == input$tab | df$table2 == input$tab) ,]
       return(df)
     })
     
-    output$adjlist <- renderTable({
+    output$adjlist <- renderDataTable({
       adjdf()
     })
     
@@ -282,4 +269,78 @@ tableNet <- function(dfL) {
   )
   
 }
+
+
+
+#' @title Turn a directory of flat files into a list of data.frames
+#' @description Useful to prepare data for \code{\link{tableNet}}
+#' @param dfdir character string of the directory where you want to load flat files
+#' @param ext file extention on the type of files to load.  Usually \code{.csv} or \code{.txt}
+#' @param exclude character string of variables to be excluded from app.  Can also exclude variables interactively from app.
+#' @param printdf logical \code{TRUE} or \code{FALSE}. Prints progress of flat file loads to R console.
+#' @param ... parameters to pass to \code{\link{read.delim}}.  Commonly \code{nrow}, \code{sep},
+#' @seealso \code{tableNet} \code{isKey}
+#' @return list of data.frames
+#' @export
+#' 
+#' @examples
+#' 1==1
+
+dir2dfList <- function(dfdir, ext='.txt', exclude=NULL, printdf=T, ...) {
+  # get list of .txt text files in directory
+  setwd(dfdir)
+  tables <- list.files()[sapply(list.files(), function(x) substr(x,nchar(x)-3, nchar(x)))==ext]
+  tableNames <- sapply(tables, function(x) substr(x,0, nchar(x)-4), USE.NAMES=F)
+  
+  # create list of dfs from directory
+  dfL <- list()
+  for(i in 1:length(tables)) {
+    dfL[[tableNames[i]]] <- read.delim(tables[i], ...)
+    dfL[[tableNames[i]]] <- dfL[[tableNames[i]]][,!names(dfL[[tableNames[i]]]) %in% exclude]
+    if(printdf==T) print(paste(tableNames[i], nrow(dfL[[tableNames[i]]]), Sys.time()))
+  }
+  
+  return(dfL)
+}
+
+#' @title Determine strength of linking variables  
+#' @description This function computes the percentage of unique values of a column \code{x} from \code{table1} that appear in
+#' in a \code{table2}.  It is called and computed on the fly in \code{\link{tableNet}}.  However, these computations can be 
+#' slow on large datasets, so it is provided a standalone function that can be run once to store the output and fed into the 
+#' \code{\link{tableNet}} app to prevent repetitive slow computations on the fly.
+#' @param dfL list of data.frames.  easily generated from \code{\link{dir2dfList}}
+#' @param xvar character string, name of the variable to calculate strength for across all tables in \code{dfL}
+#' @param printdf prints progress of flat file loads to R console.
+#' @seealso \code{tableNet} \code{dir2dfList}
+#' @return list of data.frames 
+#' @import memoise
+#' @export
+#' 
+#' @examples
+#' 1==1
+
+
+isKey <- memoise(function(dfL, xvar) {
+  
+  tabNames <- lapply(dfL, names)
+  tabs <- names(which(lapply(tabNames, function(x) xvar %in% x)==T))
+  mat <- matrix(nrow=length(tabs), ncol=length(tabs))
+  ii <- 1; 
+  for(i in tabs){
+    iivar <- dfL[[i]][,xvar]
+    jj <- 1
+    for(j in tabs){
+      jjvar <- dfL[[j]][,xvar]
+      stop
+      mat[jj,ii] <- sum(jjvar %in% iivar)/length(jjvar)
+      jj<-jj+1
+    }
+    ii<-ii+1
+  }
+  
+  mat[is.na(mat)] <- 0
+  colnames(mat) <- tabs
+  rownames(mat) <- tabs
+  return(mat)
+})
 

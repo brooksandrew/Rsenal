@@ -10,13 +10,14 @@ Current clusters of functionality:
 * cleaning data 
 * scaling and transforming data
 * manipulating/summarizing outputs from models and association rules
+* Shiny apps: relational db schema explorer, association rule explorer, IPIP
 
 ### How to download
 
 `install.packages('devtools') # if devtools not already installed`  
-`require('devtools') `  
+`library('devtools') `  
 `install_github('brooksandrew/Rsenal')`  
-`require('Rsenal')`
+`library('Rsenal')`
 
 That's it, you got it.
 

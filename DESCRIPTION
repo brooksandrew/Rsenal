@@ -18,10 +18,12 @@ Imports:
     Hmisc,
     shiny,
     ggplot2,
-    arulesViz,
     arules,
+    arulesViz,
     vcd,
     RColorBrewer,
     fmsb,
-    MASS
+    MASS,
+    gplots,
+    memoise
 Suggests:
