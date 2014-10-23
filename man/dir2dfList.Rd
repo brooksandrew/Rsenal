@@ -2,8 +2,7 @@
 \alias{dir2dfList}
 \title{Turn a directory of flat files into a list of data.frames}
 \usage{
-  dir2dfList(dfdir, ext = ".txt", exclude = NULL,
-    printdf = T, ...)
+  dir2dfList(dfdir, ext = ".txt", exclude = NULL, ...)
 }
 \arguments{
   \item{dfdir}{character string of the directory where you
@@ -12,12 +11,10 @@
   \item{ext}{file extention on the type of files to load.
   Usually \code{.csv} or \code{.txt}}
 
-  \item{exclude}{character string of variables to be
-  excluded from app.  Can also exclude variables
-  interactively from app.}
-
-  \item{printdf}{logical \code{TRUE} or \code{FALSE}.
-  Prints progress of flat file loads to R console.}
+  \item{exclude}{character string of table names to be
+  excluded from app.  Needs to be specified to \code{NULL}
+  or a character vector or else \code{...} arguments will
+  not be handled properly.}
 
   \item{...}{parameters to pass to
   \code{\link{read.delim}}.  Commonly \code{nrow},
@@ -30,7 +27,16 @@
   Useful to prepare data for \code{\link{tableNet}}
 }
 \examples{
-1==1
+\dontrun{
+## download some baseball data. NOTE This will download 30MB of data (25 csv files) into a temporary directory
+temp <- tempfile()
+localDataDir <- paste0(tempdir(), '\\\\lahman2012-csv-onYourComp.zip')
+download.file('http://seanlahman.com/files/database/lahman2012-csv.zip', localDataDir)
+unzip(localDataDir, exdir=paste0(tempdir(), '\\\\lahman2012-csv-onYourComp')) ## may not be necessary
+
+## create a list of data.frames from .CSVs
+dfL <- dir2dfList(paste0(tempdir(), '\\\\lahman2012-csv-onYourComp'), ext='.csv', exclude=NULL, sep=',', stringsAsFactors=F)
+}
 }
 \seealso{
   \code{tableNet} \code{isKey}

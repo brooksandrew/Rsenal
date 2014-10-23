@@ -13,6 +13,21 @@
 #' @return Shiny App
 #' @import memoise shiny gplots igraph
 #' @export
+#' @examples
+#' \dontrun{
+#' ## download some baseball data. NOTE This will download 30MB of data (25 csv files) into a temporary directory
+#' temp <- tempfile()
+#' localDataDir <- paste0(tempdir(), '\\lahman2012-csv-onYourComp.zip')
+#' download.file('http://seanlahman.com/files/database/lahman2012-csv.zip', localDataDir)
+#' unzip(localDataDir, exdir=paste0(tempdir(), '\\lahman2012-csv-onYourComp')) ## may not be necessary
+#' 
+#' ## create a list of data.frames from .CSVs
+#' dfL <- dir2dfList(paste0(tempdir(), '\\lahman2012-csv-onYourComp'), ext='.csv', exclude=NULL, sep=',', stringsAsFactors=F)
+#' 
+#' ## launch app
+#' tableNet(dfL)
+#' }
+
 
 tableNet <- function(dfL) {
   
@@ -54,6 +69,9 @@ tableNet <- function(dfL) {
  
   ## create schema network graph
   g <- dfL2network(dfL)
+  
+  ## create memo'ized version of isKey to has
+  isKeym <- memoise(isKey)
     
   #######################################################
   ## ACTUALLY RUN APP ###################################
@@ -204,7 +222,7 @@ tableNet <- function(dfL) {
       ## defining keyL object
       if(input$keyList==TRUE) {keyL <- get(input$keyListObject)[[input$key]]
       } else {
-        keyL <- isKey(dfL, input$key)
+        keyL <- isKeym(dfL, input$key)
       }
 
       myPalette <- colorRampPalette(c("white", "firebrick"))(n=20)
@@ -270,17 +288,26 @@ tableNet <- function(dfL) {
 #' @description Useful to prepare data for \code{\link{tableNet}}
 #' @param dfdir character string of the directory where you want to load flat files
 #' @param ext file extention on the type of files to load.  Usually \code{.csv} or \code{.txt}
-#' @param exclude character string of variables to be excluded from app.  Can also exclude variables interactively from app.
-#' @param printdf logical \code{TRUE} or \code{FALSE}. Prints progress of flat file loads to R console.
+#' @param exclude character string of table names to be excluded from app.  Needs to be specified to \code{NULL} or a character
+#' vector or else \code{...} arguments will not be handled properly.
 #' @param ... parameters to pass to \code{\link{read.delim}}.  Commonly \code{nrow}, \code{sep},
 #' @seealso \code{tableNet} \code{isKey}
 #' @return list of data.frames
 #' @export
 #' 
 #' @examples
-#' 1==1
+#' \dontrun{
+#' ## download some baseball data. NOTE This will download 30MB of data (25 csv files) into a temporary directory
+#' temp <- tempfile()
+#' localDataDir <- paste0(tempdir(), '\\lahman2012-csv-onYourComp.zip')
+#' download.file('http://seanlahman.com/files/database/lahman2012-csv.zip', localDataDir)
+#' unzip(localDataDir, exdir=paste0(tempdir(), '\\lahman2012-csv-onYourComp')) ## may not be necessary
+#' 
+#' ## create a list of data.frames from .CSVs
+#' dfL <- dir2dfList(paste0(tempdir(), '\\lahman2012-csv-onYourComp'), ext='.csv', exclude=NULL, sep=',', stringsAsFactors=F)
+#' }
 
-dir2dfList <- function(dfdir, ext='.txt', exclude=NULL, printdf=T, ...) {
+dir2dfList <- function(dfdir, ext='.txt', exclude=NULL, ...) {
   # get list of .txt text files in directory
   setwd(dfdir)
   tables <- list.files()[sapply(list.files(), function(x) substr(x,nchar(x)-3, nchar(x)))==ext]
@@ -291,7 +318,7 @@ dir2dfList <- function(dfdir, ext='.txt', exclude=NULL, printdf=T, ...) {
   for(i in 1:length(tables)) {
     dfL[[tableNames[i]]] <- read.delim(tables[i], ...)
     dfL[[tableNames[i]]] <- dfL[[tableNames[i]]][,!names(dfL[[tableNames[i]]]) %in% exclude]
-    if(printdf==T) print(paste(tableNames[i], nrow(dfL[[tableNames[i]]]), Sys.time()))
+    print(paste(tableNames[i], nrow(dfL[[tableNames[i]]]), Sys.time()))
   }
   
   return(dfL)
@@ -307,14 +334,23 @@ dir2dfList <- function(dfdir, ext='.txt', exclude=NULL, printdf=T, ...) {
 #' @param printdf prints progress of flat file loads to R console.
 #' @seealso \code{tableNet} \code{dir2dfList}
 #' @return list of data.frames 
-#' @import memoise
 #' @export
 #' 
 #' @examples
-#' 1==1
+#' \dontrun{
+#' ## download some baseball data. NOTE This will download 30MB of data (25 csv files) into a temporary directory
+#' temp <- tempfile()
+#' localDataDir <- paste0(tempdir(), '\\lahman2012-csv-onYourComp.zip')
+#' download.file('http://seanlahman.com/files/database/lahman2012-csv.zip', localDataDir)
+#' unzip(localDataDir, exdir=paste0(tempdir(), '\\lahman2012-csv-onYourComp')) ## may not be necessary
+#' 
+#' ## create a list of data.frames from .CSVs
+#' dfL <- dir2dfList(paste0(tempdir(), '\\lahman2012-csv-onYourComp'), ext='.csv', exclude=NULL, sep=',', stringsAsFactors=F)
+#' isKey(dfL, 'playerID')
+#' }
 
 
-isKey <- memoise(function(dfL, xvar) {
+isKey <- function(dfL, xvar) {
   
   tabNames <- lapply(dfL, names)
   tabs <- names(which(lapply(tabNames, function(x) xvar %in% x)==T))
@@ -336,5 +372,5 @@ isKey <- memoise(function(dfL, xvar) {
   colnames(mat) <- tabs
   rownames(mat) <- tabs
   return(mat)
-})
+}
 

@@ -2,7 +2,7 @@
 \alias{isKey}
 \title{Determine strength of linking variables}
 \usage{
-  isKey(...)
+  isKey(dfL, xvar)
 }
 \arguments{
   \item{dfL}{list of data.frames.  easily generated from
@@ -28,7 +28,17 @@
   slow computations on the fly.
 }
 \examples{
-1==1
+\dontrun{
+## download some baseball data. NOTE This will download 30MB of data (25 csv files) into a temporary directory
+temp <- tempfile()
+localDataDir <- paste0(tempdir(), '\\\\lahman2012-csv-onYourComp.zip')
+download.file('http://seanlahman.com/files/database/lahman2012-csv.zip', localDataDir)
+unzip(localDataDir, exdir=paste0(tempdir(), '\\\\lahman2012-csv-onYourComp')) ## may not be necessary
+
+## create a list of data.frames from .CSVs
+dfL <- dir2dfList(paste0(tempdir(), '\\\\lahman2012-csv-onYourComp'), ext='.csv', exclude=NULL, sep=',', stringsAsFactors=F)
+isKey(dfL, 'playerID')
+}
 }
 \seealso{
   \code{tableNet} \code{dir2dfList}

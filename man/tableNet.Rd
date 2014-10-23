@@ -34,6 +34,21 @@
   similarity matrices ahead of time to prevent the Shiny
   app from doing these computations each time.
 }
+\examples{
+\dontrun{
+## download some baseball data. NOTE This will download 30MB of data (25 csv files) into a temporary directory
+temp <- tempfile()
+localDataDir <- paste0(tempdir(), '\\\\lahman2012-csv-onYourComp.zip')
+download.file('http://seanlahman.com/files/database/lahman2012-csv.zip', localDataDir)
+unzip(localDataDir, exdir=paste0(tempdir(), '\\\\lahman2012-csv-onYourComp')) ## may not be necessary
+
+## create a list of data.frames from .CSVs
+dfL <- dir2dfList(paste0(tempdir(), '\\\\lahman2012-csv-onYourComp'), ext='.csv', exclude=NULL, sep=',', stringsAsFactors=F)
+
+## launch app
+tableNet(dfL)
+}
+}
 \seealso{
   \code{dir2dfList} \code{isKey}
 }
