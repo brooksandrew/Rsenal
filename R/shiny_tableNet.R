@@ -9,7 +9,7 @@
 #' data.frames and perform set operations on every row of the variable of interest.  It is possible to use the \code{\link{isKey}} function
 #' to compute these similarity matrices ahead of time to prevent the Shiny app from doing these computations each time.
 #' @param dfL list of data.frames used to generate schema.  This is easily generated from \code{\link{dir2dfList}}
-#' @seealso \code{dir2dfList} \code{isKey}
+#' @seealso \code{\link{dir2dfList}} \code{\link{isKey}}
 #' @return Shiny App
 #' @import memoise shiny gplots igraph
 #' @export
@@ -291,7 +291,7 @@ tableNet <- function(dfL) {
 #' @param exclude character string of table names to be excluded from app.  Needs to be specified to \code{NULL} or a character
 #' vector or else \code{...} arguments will not be handled properly.
 #' @param ... parameters to pass to \code{\link{read.delim}}.  Commonly \code{nrow}, \code{sep},
-#' @seealso \code{tableNet} \code{isKey}
+#' @seealso \code{\link{tableNet}} \code{\link{isKey}}
 #' @return list of data.frames
 #' @export
 #' 
@@ -332,7 +332,7 @@ dir2dfList <- function(dfdir, ext='.txt', exclude=NULL, ...) {
 #' @param dfL list of data.frames.  easily generated from \code{\link{dir2dfList}}
 #' @param xvar character string, name of the variable to calculate strength for across all tables in \code{dfL}
 #' @param printdf prints progress of flat file loads to R console.
-#' @seealso \code{tableNet} \code{dir2dfList}
+#' @seealso \code{\link{tableNet}} \code{\link{dir2dfList}}
 #' @return list of data.frames 
 #' @export
 #' 

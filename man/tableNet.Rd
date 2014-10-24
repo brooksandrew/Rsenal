@@ -50,6 +50,6 @@ tableNet(dfL)
 }
 }
 \seealso{
-  \code{dir2dfList} \code{isKey}
+  \code{\link{dir2dfList}} \code{\link{isKey}}
 }
 
