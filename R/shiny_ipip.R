@@ -9,7 +9,7 @@
 #' should be the corresponding results from the test for a person. Frist row is treated is as a header (Person's names). \cr
 #' @source \link{http://www.personal.psu.edu/j5j/IPIP/}
 #' @return Shiny App
-#' @imports shiny, ggplot2, vcd, fmsb, MASS, arulesViz, RcolorBrewer
+#' @import shiny ggplot2 vcd fmsb MASS arulesViz RColorBrewer
 #' @export
 #' @examples
 #'## creating some fake ipip data

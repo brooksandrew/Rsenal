@@ -9,7 +9,7 @@
 #' mtcars2 <- mtcars
 #' for(i in 1:ncol(mtcars2)) mtcars2[sample(nrow(mtcars2), sample(1:5,1), replace=T),i] <- NA
 #' missdf(mtcars2)
-#' }
+
 
 missdf <- function(df, criteria='NA') {
   n <- nrow(df)
