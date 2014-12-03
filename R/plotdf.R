@@ -36,8 +36,9 @@ plotNum <- function(x, ...) {
   par(mfrow=c(3, 2))
   par(oma=c(1,2,2,2))
   layout(matrix(c(1,1,2,2,2,2), 3, 2, byrow=T), widths=c(1,1), heights=c(1,1,1))
+  ptitle <- ifelse(is.null(list(...)$vn), '', list(...)$vn)
   
-  p1<-plot(0:1, 0:1, col='white', yaxt='n', ylab = '', xaxt='n', xlab='')
+  p1<-plot(0:1, 0:1, col='white', yaxt='n', ylab = '', xaxt='n', xlab='', main=ptitle)
   text(x=0.2, y=0.8, label='type:', pos=4, font=2)
   text(x=0.2, y=0.7, label='# of unique values:', pos=4, font=2)
   text(x=0.2, y=0.6, label='% NA:', pos=4, font=2)
@@ -54,7 +55,6 @@ plotNum <- function(x, ...) {
   text(x=0.4, y=0.3, label=mean(x, na.rm=T), pos=4)
   text(x=0.4, y=0.2, label=max(x, na.rm=T), pos=4)
   
-  ptitle <- ifelse(is.null(list(...)$vn), '', list(...)$vn)
   p2<-hist(x, main=ptitle, breaks=30, xlab=ptitle, col='grey')
   rug(x, col='red')
   
@@ -71,9 +71,9 @@ plotChar <- function(x, ...) {
   
   ptitle <- ifelse(is.null(list(...)$vn), '', list(...)$vn)
   tab <- sort(table(x), decreasing=T)[1:min(length(unique(x)),50)]
-  tabmiss <- round(sum(tab)/length(x)*100, 1)
+  tabmiss <- round(sum(tab, na.rm=T)/length(x)*100, 1)
   
-  p1 <- plot(0:1, 0:1, col='white', yaxt='n', ylab = '', xaxt='n', xlab='')
+  p1 <- plot(0:1, 0:1, col='white', yaxt='n', ylab = '', xaxt='n', xlab='', main=ptitle)
   text(x=0.2, y=0.8, label='type:', pos=4, font=2)
   text(x=0.2, y=0.7, label='# of unique values:', pos=4, font=2)
   text(x=0.2, y=0.6, label='% NA:', pos=4, font=2)
