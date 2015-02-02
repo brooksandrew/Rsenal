@@ -14,6 +14,9 @@ binCat(x, ncat = NULL, maxp = NULL, results = F)
 
 \item{results}{logical \code{TRUE} or \code{FALSE}.  Prints a frequency table of the new categories.}
 }
+\value{
+vector of binned data
+}
 \description{
 Bins categorical variables into a smaller number of bins.  Useful when modeling with variables that have many small categories.
 The largest categories are taken as is and the smaller categories are collapsed into a new field named 'other.'

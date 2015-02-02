@@ -2,6 +2,7 @@
 
 export(arulesApp)
 export(balPanel)
+export(binCat)
 export(depthbin)
 export(dir2dfList)
 export(editForm)
