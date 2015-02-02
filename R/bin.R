@@ -84,7 +84,7 @@ roundCut <- function(x, r=1){
 #' @param ncat number 0 to 100 (or higher I suppose).  Number of bins to collapse data to
 #' @param maxp number 0 to 1.  Percentage of data that will be represented "as is" before categories are collapsed to "other"
 #' @param results logical \code{TRUE} or \code{FALSE}.  Prints a frequency table of the new categories.
-
+#' @export
 #' @examples
 #' d <- rpois(1000, 20)
 #' d[d>26] <- sample(1:26, length(d[d>26]), replace=T)
