@@ -116,7 +116,7 @@ arulesApp <- function (dataset, bin=T) {
      
      ## Extracting and Defining arules
      rules <- reactive({
-       #ar <- apriori(a[,input$cols], parameter=list(support=input$supp, confidence=input$conf, minlen=input$minL, maxlen=input$maxL))
+       arAll <- apriori(dataset[,input$cols], parameter=list(support=input$supp, confidence=input$conf, minlen=input$minL, maxlen=input$maxL))
        
        if(input$rhsv=='Subset' & input$lhsv!='Subset'){
          varsR <- character()
@@ -124,20 +124,33 @@ arulesApp <- function (dataset, bin=T) {
            tmp <- with(dataset, paste(input$colsRHS[i], '=', levels(as.factor(get(input$colsRHS[i]))), sep=''))
            varsR <- c(varsR, tmp)
          }
-         ar <- apriori(dataset[,input$cols], parameter=list(support=input$supp, confidence=input$conf, minlen=input$minL, maxlen=input$maxL),
-                       appearance=list(rhs=varsR, default='lhs'))
+         ar <- subset(arAll, subset=rhs %in% varsR)
+         
        } else if(input$lhsv=='Subset' & input$rhsv!='Subset') {
          varsL <- character()
          for(i in 1:length(input$colsLHS)){
            tmp <- with(dataset, paste(input$colsLHS[i], '=', levels(as.factor(get(input$colsLHS[i]))), sep=''))
            varsL <- c(varsL, tmp)
          }
-         ar <- apriori(dataset[,input$cols], parameter=list(support=input$supp, confidence=input$conf, minlen=input$minL, maxlen=input$maxL),
-                       appearance=list(lhs=varsL, default='rhs'))
+         ar <- subset(arAll, subset=lhs %in% varsL)
+         
+       } else if(input$lhsv=='Subset' & input$rhsv=='Subset') {
+         varsL <- character()
+         for(i in 1:length(input$colsLHS)){
+           tmp <- with(dataset, paste(input$colsLHS[i], '=', levels(as.factor(get(input$colsLHS[i]))), sep=''))
+           varsL <- c(varsL, tmp)
+         }
+         varsR <- character()
+         for(i in 1:length(input$colsRHS)){
+           tmp <- with(dataset, paste(input$colsRHS[i], '=', levels(as.factor(get(input$colsRHS[i]))), sep=''))
+           varsR <- c(varsR, tmp)
+         }
+         ar <- subset(arAll, subset=lhs %in% varsL & rhs %in% varsR)
+         
        } else {
-         ar <- apriori(dataset[,input$cols], parameter=list(support=input$supp, confidence=input$conf, minlen=input$minL, maxlen=input$maxL))
+         ar <- arAll
        }
-       
+       ar
      })
      
      # Rule length
@@ -173,8 +186,9 @@ arulesApp <- function (dataset, bin=T) {
      ## Rules Printed ########################
      output$rulesTable <- renderPrint({
        #hack to disply results... make sure this match line above!!
-       ar <- apriori(dataset[,input$cols], parameter=list(support=input$supp, confidence=input$conf, minlen=input$minL, maxlen=input$maxL))
-       inspect(sort(rules(), by=input$sort))
+       #ar <- apriori(dataset[,input$cols], parameter=list(support=input$supp, confidence=input$conf, minlen=input$minL, maxlen=input$maxL))
+       ar <- rules()
+       inspect(sort(ar, by=input$sort))
      })
      
      ## Download data to csv ########################
