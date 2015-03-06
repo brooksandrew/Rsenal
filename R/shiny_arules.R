@@ -117,7 +117,8 @@ arulesApp <- function (dataset, bin=T) {
      
      ## Extracting and Defining arules
      rules <- reactive({
-       arAll <- apriori(dataset[,input$cols], parameter=list(support=input$supp, confidence=input$conf, minlen=input$minL, maxlen=input$maxL))
+       tr <- as(dataset[,input$cols], 'transactions')
+       arAll <- apriori(tr, parameter=list(support=input$supp, confidence=input$conf, minlen=input$minL, maxlen=input$maxL))
        
        if(input$rhsv=='Subset' & input$lhsv!='Subset'){
          varsR <- character()
@@ -151,6 +152,14 @@ arulesApp <- function (dataset, bin=T) {
        } else {
          ar <- arAll
        }
+       quality(ar)$conviction <- interestMeasure(ar, method='conviction', transactions=tr)
+       quality(ar)$hyperConfidence <- interestMeasure(ar, method='hyperConfidence', transactions=tr)
+       quality(ar)$cosine <- interestMeasure(ar, method='cosine', transactions=tr)
+       quality(ar)$chiSquare <- interestMeasure(ar, method='chiSquare', transactions=tr)
+       quality(ar)$coverage <- interestMeasure(ar, method='coverage', transactions=tr)
+       quality(ar)$doc <- interestMeasure(ar, method='doc', transactions=tr)
+       quality(ar)$gini <- interestMeasure(ar, method='gini', transactions=tr)
+       quality(ar)$hyperLift <- interestMeasure(ar, method='hyperLift', transactions=tr)
        ar
      })
      
