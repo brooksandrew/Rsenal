@@ -52,7 +52,7 @@ arulesApp <- function (dataset, bin=T) {
       
       conditionalPanel(
         condition = "input.mytab=='graph'",
-        selectInput('graphType', label='Graph Type', choices = c('itemsets','items')), br()
+        radioButtons('graphType', label='Graph Type', choices=c('itemsets','items'), inline=T), br()
       ),
       
       conditionalPanel(
@@ -66,8 +66,8 @@ arulesApp <- function (dataset, bin=T) {
       ),
       
       conditionalPanel(
-        condition = "input.mytab %in%' c('grouped', 'graph', 'table', 'datatable', 'scatter')", 
-        radioButtons('samp', label='Sample', choices=c('All Rules', 'Sample')), br(),
+        condition = "input.mytab %in%' c('grouped', 'graph', 'table', 'datatable', 'scatter', 'itemFreq')", 
+        radioButtons('samp', label='Sample', choices=c('All Rules', 'Sample'), inline=T), br(),
         uiOutput("choose_columns"), br(),
         sliderInput("supp", "Support:", min = 0, max = 1, value = 0.1 , step = 1/10000), br(),
         sliderInput("conf", "Confidence:", min = 0, max = 1, value = 0.5 , step = 1/10000), br(),
@@ -86,6 +86,7 @@ arulesApp <- function (dataset, bin=T) {
                   tabPanel('Grouped', value='grouped', plotOutput("groupedPlot", width='100%', height='100%')),
                   tabPanel('Graph', value='graph', plotOutput("graphPlot", width='100%', height='100%')),
                   tabPanel('Scatter', value='scatter', plotOutput("scatterPlot", width='100%', height='100%')),
+                  tabPanel('ItemFreq', value='itemFreq', plotOutput("itemFreqPlot", width='100%', height='100%')),
                   tabPanel('Table', value='table', verbatimTextOutput("rulesTable")),
                   tabPanel('Data Table', value='datatable', dataTableOutput("rulesDataTable"))
       )
@@ -174,6 +175,12 @@ arulesApp <- function (dataset, bin=T) {
      output$scatterPlot <- renderPlot({
        ar <- rules()
        plot(sort(ar, by=input$sort)[1:nR()], method='scatterplot')
+     }, height=800, width=800)
+     
+     ## Item Frequency Plot ##########################
+     output$itemFreqPlot <- renderPlot({
+       trans <- as(dataset[,input$cols], 'transactions')
+       itemFrequencyPlot(trans)
      }, height=800, width=800)
      
      ## Rules Data Table ##########################
