@@ -3,10 +3,12 @@
 \alias{rules2df}
 \title{Transform association rule results into data.frame}
 \usage{
-rules2df(rules)
+rules2df(rules, list = F)
 }
 \arguments{
 \item{rules}{list of association rules (S4 arules object).  Output of \code{apriori} function.}
+
+\item{list}{logical \code{TRUE} or \code{FALSE}.  sets LHS items in a list, rather than one character string}
 }
 \value{
 association rules in a data.frame
