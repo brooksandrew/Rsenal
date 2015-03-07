@@ -22,7 +22,8 @@ Creates a matrix of transactions/observations (rows) by association rules (colum
 0 in the matrix indicates that the rule does not apply (LHS of rule not in obs/tranaction).
 }
 \examples{
-require('arules')
+library('arules')
+library('BBmisc')
 data(Adult)
 rules <- apriori(Adult, parameter=list(support=0.5, confidence=0.95))
 rdf <- rules2df(rules, list=T)

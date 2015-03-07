@@ -11,7 +11,8 @@
 #' @return matrix tying obs/transactions to association rules
 #' @export
 #' @examples
-#' require('arules')
+#' library('arules')
+#' library('BBmisc')
 #' data(Adult)
 #' rules <- apriori(Adult, parameter=list(support=0.5, confidence=0.95))
 #' rdf <- rules2df(rules, list=T)
