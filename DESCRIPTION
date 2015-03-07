@@ -25,5 +25,6 @@ Imports:
     fmsb,
     MASS,
     gplots,
-    memoise
+    memoise,
+    BBmisc
 Suggests:
