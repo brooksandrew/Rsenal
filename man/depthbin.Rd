@@ -3,7 +3,7 @@
 \alias{depthbin}
 \title{Equal depth binning}
 \usage{
-depthbin(ser, nbins = 10, qtype = 7, digits = 10)
+depthbin(ser, nbins = 10, qtype = 7, digits = 10, labelRange = T)
 }
 \arguments{
 \item{ser}{numeric vector to bin}
@@ -13,6 +13,8 @@ depthbin(ser, nbins = 10, qtype = 7, digits = 10)
 \item{qtype}{an integer between 1 and 9 selecting one of the nine quantile algorithms detailed below to be used.  See \code{\link{quantile}} for more details.  Default is 7.}
 
 \item{digits}{number, number of digits to display in bin categories}
+
+\item{labelRange}{logical: \code{TRUE} assigns a numeric score/ranking (ex. 1/3, 2/3, or 3/3 if 3 bins) to each bin. \code{FALSE} keeps the numeric range for each bin as the factor label}
 }
 \value{
 ordered factor vector with bins

@@ -5,6 +5,7 @@
 #' @param nbins number of bins desired
 #' @param qtype an integer between 1 and 9 selecting one of the nine quantile algorithms detailed below to be used.  See \code{\link{quantile}} for more details.  Default is 7.
 #' @param digits number, number of digits to display in bin categories
+#' @param labelRange logical: \code{TRUE} assigns a numeric score/ranking (ex. 1/3, 2/3, or 3/3 if 3 bins) to each bin. \code{FALSE} keeps the numeric range for each bin as the factor label
 #' 
 #' @seealso \code{\link{quantile}}
 #' @return ordered factor vector with bins
@@ -26,7 +27,7 @@
 #' binned3 <- depthbin(x3, nbins=5)
 #' summary(binned3)
 
-depthbin <- function(ser, nbins=10, qtype=7, digits=10) {
+depthbin <- function(ser, nbins=10, qtype=7, digits=10, labelRange=T) {
   cutpts <- quantile(ser, probs=seq(0, 1, 1/nbins), na.rm=T, type=qtype)
   if(length(unique(cutpts))==nbins+1) {
     returnser <- cut(ser, breaks=cutpts, right=T, include.lowest=T)  
@@ -43,6 +44,7 @@ depthbin <- function(ser, nbins=10, qtype=7, digits=10) {
     cutpts <- c(unique(cutpts), alldup)
     returnser <- cut(ser, breaks=cutpts, include.lowest=T, dig.lab=digits, right=F)
   }
+  if (labelRange==F) levels(returnser) <- paste0(1:length(levels(returnser)), '/', length(levels(returnser)))
   return(returnser)
 }
 
