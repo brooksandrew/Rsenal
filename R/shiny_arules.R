@@ -66,6 +66,12 @@ arulesApp <- function (dataset, bin=T) {
       ),
       
       conditionalPanel(
+        condition = "input.mytab=='grouped'",
+        sliderInput('k', label='Choose # of rule clusters', min=1, max=150, step=1, value=15), br()
+      ),
+      
+      
+      conditionalPanel(
         condition = "input.mytab %in%' c('grouped', 'graph', 'table', 'datatable', 'scatter', 'paracoord', 'matrix', 'itemFreq')", 
         radioButtons('samp', label='Sample', choices=c('All Rules', 'Sample'), inline=T), br(),
         uiOutput("choose_columns"), br(),
@@ -173,7 +179,7 @@ arulesApp <- function (dataset, bin=T) {
      ## Grouped Plot #########################
      output$groupedPlot <- renderPlot({
        ar <- rules()
-       plot(sort(ar, by=input$sort)[1:nR()], method='grouped')
+       plot(sort(ar, by=input$sort)[1:nR()], method='grouped', control=list(k=input$k))
      }, height=800, width=800)
      
      ## Graph Plot ##########################
