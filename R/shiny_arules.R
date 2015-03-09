@@ -66,7 +66,7 @@ arulesApp <- function (dataset, bin=T) {
       ),
       
       conditionalPanel(
-        condition = "input.mytab %in%' c('grouped', 'graph', 'table', 'datatable', 'scatter', 'itemFreq')", 
+        condition = "input.mytab %in%' c('grouped', 'graph', 'table', 'datatable', 'scatter', 'paracoord', 'matrix', 'itemFreq')", 
         radioButtons('samp', label='Sample', choices=c('All Rules', 'Sample'), inline=T), br(),
         uiOutput("choose_columns"), br(),
         sliderInput("supp", "Support:", min = 0, max = 1, value = 0.1 , step = 1/10000), br(),
@@ -86,6 +86,8 @@ arulesApp <- function (dataset, bin=T) {
                   tabPanel('Grouped', value='grouped', plotOutput("groupedPlot", width='100%', height='100%')),
                   tabPanel('Graph', value='graph', plotOutput("graphPlot", width='100%', height='100%')),
                   tabPanel('Scatter', value='scatter', plotOutput("scatterPlot", width='100%', height='100%')),
+                  tabPanel('Parallel Coordinates', value='paracoord', plotOutput("paracoordPlot", width='100%', height='100%')),
+                  tabPanel('Matrix', value='matrix', plotOutput("matrixPlot", width='100%', height='100%')),
                   tabPanel('ItemFreq', value='itemFreq', plotOutput("itemFreqPlot", width='100%', height='100%')),
                   tabPanel('Table', value='table', verbatimTextOutput("rulesTable")),
                   tabPanel('Data Table', value='datatable', dataTableOutput("rulesDataTable"))
@@ -184,6 +186,18 @@ arulesApp <- function (dataset, bin=T) {
      output$scatterPlot <- renderPlot({
        ar <- rules()
        plot(sort(ar, by=input$sort)[1:nR()], method='scatterplot')
+     }, height=800, width=800)
+     
+     ## Parallel Coordinates Plot ###################
+     output$paracoordPlot <- renderPlot({
+       ar <- rules()
+       plot(sort(ar, by=input$sort)[1:nR()], method='paracoord')
+     }, height=800, width=800)
+     
+     ## Matrix Plot ###################
+     output$matrixPlot <- renderPlot({
+       ar <- rules()
+       plot(sort(ar, by=input$sort)[1:nR()], method='matrix', control=list(reorder=T))
      }, height=800, width=800)
      
      ## Item Frequency Plot ##########################
