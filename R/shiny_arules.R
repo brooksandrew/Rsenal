@@ -72,6 +72,14 @@ arulesApp <- function (dataset, bin=T) {
       
       
       conditionalPanel(
+        condition = "input.submitYN=='onclick'",
+         submitButton('refresh!')
+        ), 
+      
+      radioButtons('submitYN', label='Submit?', choices=c('auto', 'onclick'), inline=T, selected='onclick'), br(),
+      
+      
+      conditionalPanel(
         condition = "input.mytab %in%' c('grouped', 'graph', 'table', 'datatable', 'scatter', 'paracoord', 'matrix', 'itemFreq')", 
         radioButtons('samp', label='Sample', choices=c('All Rules', 'Sample'), inline=T), br(),
         uiOutput("choose_columns"), br(),
