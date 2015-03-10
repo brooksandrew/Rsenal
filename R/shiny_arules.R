@@ -69,16 +69,7 @@ arulesApp <- function (dataset, bin=T) {
         condition = "input.mytab=='grouped'",
         sliderInput('k', label='Choose # of rule clusters', min=1, max=150, step=1, value=15), br()
       ),
-      
-      
-      conditionalPanel(
-        condition = "input.submitYN=='onclick'",
-         submitButton('refresh!')
-        ), 
-      
-      radioButtons('submitYN', label='Submit?', choices=c('auto', 'onclick'), inline=T, selected='onclick'), br(),
-      
-      
+            
       conditionalPanel(
         condition = "input.mytab %in%' c('grouped', 'graph', 'table', 'datatable', 'scatter', 'paracoord', 'matrix', 'itemFreq')", 
         radioButtons('samp', label='Sample', choices=c('All Rules', 'Sample'), inline=T), br(),
