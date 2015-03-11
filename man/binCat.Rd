@@ -3,7 +3,8 @@
 \alias{binCat}
 \title{categorical data binning by collapsing}
 \usage{
-binCat(x, ncat = NULL, maxp = NULL, results = F)
+binCat(x, ncat = NULL, maxp = NULL, results = F, setNA = NA,
+  keepNA = F)
 }
 \arguments{
 \item{x}{vector to bin.  It is transformed to a character, so any type is acceptable}
@@ -13,6 +14,10 @@ binCat(x, ncat = NULL, maxp = NULL, results = F)
 \item{maxp}{number 0 to 1.  Percentage of data that will be represented "as is" before categories are collapsed to "other"}
 
 \item{results}{logical \code{TRUE} or \code{FALSE}.  Prints a frequency table of the new categories.}
+
+\item{setNA}{value to set NAs to.  default is to keep NA.  Can set to a character string to make NAs a category}
+
+\item{keepNA}{logical. \code{TRUE} keeps NAs as their own character.  \code{FALSE} bundles NAs into 'other' category.}
 }
 \value{
 vector of binned data
@@ -26,7 +31,8 @@ There are two options for determining the number of bins: \cr
 }
 \details{
 It is advisable to use only the \code{ncat} OR \code{maxp} parameters.  When both used together, they will return whichever
-criteria yields the smaller number of bins.
+criteria yields the smaller number of bins. \cr
+Possible unexpected behavior when setNA=NA and keepNA=T.  To keep NAs as standalone category, need to make setNA something that is not NA.
 }
 \examples{
 d <- rpois(1000, 20)
@@ -36,5 +42,10 @@ barplot(table(dl))
 table(binCat(dl, results=F, ncat=5))
 table(binCat(dl, results=F, maxp=0.5))
 table(binCat(dl, results=F, maxp=0.9))
+
+## With missings
+ff <- sample(letters[1:15], 100, replace=T)
+ff[sample(100, 10)] <- NA
+binCat(ff, ncat=7, setNA='missing')
 }
 

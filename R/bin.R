@@ -80,12 +80,15 @@ roundCut <- function(x, r=1){
 #' 1. Specify the exact number of bins desired (\code{ncat}) \cr
 #' 2. Specify how the share of your variable that will be represented with actual categories before naming everything else 'other' (\code{maxp}) \cr
 #' @details It is advisable to use only the \code{ncat} OR \code{maxp} parameters.  When both used together, they will return whichever 
-#' criteria yields the smaller number of bins.
+#' criteria yields the smaller number of bins. \cr
+#' Possible unexpected behavior when setNA=NA and keepNA=T.  To keep NAs as standalone category, need to make setNA something that is not NA.
 #' 
 #' @param x vector to bin.  It is transformed to a character, so any type is acceptable
 #' @param ncat number 0 to 100 (or higher I suppose).  Number of bins to collapse data to
 #' @param maxp number 0 to 1.  Percentage of data that will be represented "as is" before categories are collapsed to "other"
 #' @param results logical \code{TRUE} or \code{FALSE}.  Prints a frequency table of the new categories.
+#' @param setNA value to set NAs to.  default is to keep NA.  Can set to a character string to make NAs a category
+#' @param keepNA logical. \code{TRUE} keeps NAs as their own character.  \code{FALSE} bundles NAs into 'other' category.
 #' @return vector of binned data
 #' @export
 #' @examples
@@ -96,10 +99,16 @@ roundCut <- function(x, r=1){
 #' table(binCat(dl, results=F, ncat=5))
 #' table(binCat(dl, results=F, maxp=0.5))
 #' table(binCat(dl, results=F, maxp=0.9))
+#' 
+#' ## With missings
+#' ff <- sample(letters[1:15], 100, replace=T)
+#' ff[sample(100, 10)] <- NA
+#' binCat(ff, ncat=7, setNA='missing')
 
 
-binCat <- function(x, ncat=NULL, maxp=NULL, results=F) {
+binCat <- function(x, ncat=NULL, maxp=NULL, results=F, setNA=NA, keepNA=F) {
   if(is.null(maxp)==F & is.null(ncat)==F) warning("Parameters 'ncat' and 'maxp' are both specified.  It is advisable to only specify one of these criteria.  Algorithm will stop at the first criteria met.")
+  if(is.na(setNA)==F) x[is.na(x)] <- setNA
   
   ncat <- min(ncat, length(unique(x)))
   x <- as.character(x)
@@ -111,9 +120,9 @@ binCat <- function(x, ncat=NULL, maxp=NULL, results=F) {
     x1 <- sort(table(xc, exclude=NULL), decreasing=T)[1:i]
     catp <- sum(x1)/n
     if(i==ncat | catp>maxp)  {
-      print(i)
       x2 <- sort(table(xc, exclude=NULL), decreasing=T)[1:(i+1)]
-      xc[which(!xc %in% names(x2))] <- 'other'
+      if(keepNA==T) {xc[which(!xc %in% c(names(x2), setNA))] <- 'other'
+      } else {xc[which(!xc %in% names(x2))] <- 'other'}
       returnser <- xc
       break
     }
