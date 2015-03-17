@@ -31,7 +31,7 @@
 #' ## calling Shiny App to visualize association rules
 #' arulesApp(d)
 
-arulesApp <- function (dataset, bin=T) {
+arulesApp <- function (dataset, bin=T, vars=5) {
   
   ## binning numeric data
   for(i in 1:ncol(dataset)) {
@@ -47,7 +47,7 @@ arulesApp <- function (dataset, bin=T) {
       
       conditionalPanel(
         condition = "input.samp=='Sample'",
-        numericInput("nrule", 'Number of Rules', 5), br()
+        numericInput("nrule", 'Number of Rules', vars), br()
       ),
       
       conditionalPanel(
