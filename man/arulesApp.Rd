@@ -3,12 +3,14 @@
 \alias{arulesApp}
 \title{Assocation Rules Visualization Shiny App}
 \usage{
-arulesApp(dataset, bin = T)
+arulesApp(dataset, bin = T, vars = 5)
 }
 \arguments{
 \item{dataset}{data.frame, this is the dataset that association rules will be mined from.  Each row is treated as a transaction.}
 
 \item{bin}{logical, \code{TRUE} will automatically discretize/bin numerical data into categorical features that can be used for association analysis.}
+
+\item{vars}{integer, how many variables to include in initial rule mining}
 }
 \value{
 Shiny App

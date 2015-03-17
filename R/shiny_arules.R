@@ -7,6 +7,7 @@
 #' 
 #' @param dataset data.frame, this is the dataset that association rules will be mined from.  Each row is treated as a transaction.
 #' @param bin logical, \code{TRUE} will automatically discretize/bin numerical data into categorical features that can be used for association analysis.
+#' @param vars integer, how many variables to include in initial rule mining 
 #' @seealso \code{arulesViz}, \code{arules}
 #' @return Shiny App
 #' @import shiny arulesViz arules
