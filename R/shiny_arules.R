@@ -48,7 +48,7 @@ arulesApp <- function (dataset, bin=T, vars=5) {
       
       conditionalPanel(
         condition = "input.samp=='Sample'",
-        numericInput("nrule", 'Number of Rules', vars), br()
+        numericInput("nrule", 'Number of Rules', 5), br()
       ),
       
       conditionalPanel(
@@ -107,7 +107,7 @@ arulesApp <- function (dataset, bin=T, vars=5) {
      output$choose_columns <- renderUI({
        checkboxGroupInput("cols", "Choose variables:", 
                           choices  = colnames(dataset),
-                          selected = colnames(dataset)[1:5])
+                          selected = colnames(dataset)[1:vars])
      })
      
      
