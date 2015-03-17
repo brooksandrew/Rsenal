@@ -9,6 +9,7 @@
 #' @param rhs list of RHS of association rules
 #' @param lhs list of LHS of association rules
 #' @return matrix tying obs/transactions to association rules
+#' @import BBmisc
 #' @export
 #' @examples
 #' library('arules')
