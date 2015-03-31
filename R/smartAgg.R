@@ -32,6 +32,18 @@
 #' ## aggregating variables by column number
 #' irisAgg3 <- smartAgg(df=iris, by=c('Species', 'randthing'), 'mean', 1:2, 'sum', 3:4, catN=T, printAgg=T)
 #'
+#' ## use anonymous functions
+#' data(mtcars)
+#' smartAgg(mtcars, by='cyl', function(x) sum(x*100), c('drat', 'mpg', 'disp'))
+#' 
+#' ## use anonymous functions with more than 1 argument.  Uses the provided variables for all unassigned arguments in anonymous function
+#' smartAgg(mtcars, by='cyl', function(x,y='carb') sum(x*y), c('drat', 'mpg', 'disp'))
+#' with(mtcars[mtcars$cyl==6,], c(sum(drat*carb), sum(mpg*carb), sum(disp*carb))) 
+#' 
+#' ## with anonymous functions with more than 1 argument.  Example of possible unintended behavior - the user-provided variable is used for both and x and y in this example.
+#' smartAgg(mtcars, by='cyl', function(x,y) sum(x*y), c('drat', 'mpg', 'disp'))
+#' with(mtcars[mtcars$cyl==6,], c(sum(drat*drat), sum(mpg*mpg), sum(carb*carb))) 
+#' 
 #' ## demonstrating speed gain of smartAgg using data.table over \code{aggregate}
 #' n <- 300000
 #' df <- data.frame(x1=rnorm(n), x2=rbinom(n,5,0.5), x3=sample(letters, n, replace=T))
@@ -59,7 +71,16 @@ smartAgg <- function(df, by, ..., catN=T, printAgg=F) {
   for(j in 1:length(aggMethod)){
     for(i in 1:length(vars[[j]])){
       if(vars[[j]][i] %in% names(df)){
-        tmp <- paste(vars[[j]][i], '=', aggMethod[[j]], '(', vars[[j]][i], ')', sep='')
+        if(class(aggMethod[[j]])=='function') {
+          afun <- paste0('af',j)
+          assign(afun, aggMethod[[j]])
+          laf2 <- as.list(formals(get(afun)))
+          laf2[which(lapply(laf2, nchar)==0)] <- vars[[j]][i] 
+          rhstmp <- paste(unlist(lapply(seq_along(laf2), function(y,n,i) paste0(n[[i]], '=', y[[i]]), n=names(laf2), y=laf2)), collapse=',')
+          tmp <- paste(vars[[j]][i], '=', afun, '(', rhstmp, ')', sep='') # anonymous functions
+        } else {         
+          tmp <- paste(vars[[j]][i], '=', aggMethod[[j]], '(', vars[[j]][i], ')', sep='') #non-anonymous functions
+        }
         k <- k+1
         varL[k] <- tmp
       } else {print(paste('WARNING: ', vars[[j]][i], ' not in dataframe', sep=''))}

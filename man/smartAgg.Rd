@@ -43,6 +43,18 @@ irisAgg2 <- smartAgg(df=iris, by=c('Species', 'randthing'), 'mean', lengthVs, 's
 ## aggregating variables by column number
 irisAgg3 <- smartAgg(df=iris, by=c('Species', 'randthing'), 'mean', 1:2, 'sum', 3:4, catN=T, printAgg=T)
 
+## use anonymous functions
+data(mtcars)
+smartAgg(mtcars, by='cyl', function(x) sum(x*100), c('drat', 'mpg', 'disp'))
+
+## use anonymous functions with more than 1 argument.  Uses the provided variables for all unassigned arguments in anonymous function
+smartAgg(mtcars, by='cyl', function(x,y='carb') sum(x*y), c('drat', 'mpg', 'disp'))
+with(mtcars[mtcars$cyl==6,], c(sum(drat*carb), sum(mpg*carb), sum(disp*carb)))
+
+## with anonymous functions with more than 1 argument.  Example of possible unintended behavior - the user-provided variable is used for both and x and y in this example.
+smartAgg(mtcars, by='cyl', function(x,y) sum(x*y), c('drat', 'mpg', 'disp'))
+with(mtcars[mtcars$cyl==6,], c(sum(drat*drat), sum(mpg*mpg), sum(carb*carb)))
+
 ## demonstrating speed gain of smartAgg using data.table over \\code{aggregate}
 n <- 300000
 df <- data.frame(x1=rnorm(n), x2=rbinom(n,5,0.5), x3=sample(letters, n, replace=T))
