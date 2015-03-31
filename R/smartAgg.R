@@ -40,11 +40,12 @@
 #' smartAgg(mtcars, by='cyl', function(x,y='carb') sum(x*y), c('drat', 'mpg', 'disp'))
 #' with(mtcars[mtcars$cyl==6,], c(sum(drat*carb), sum(mpg*carb), sum(disp*carb))) 
 #' 
-#' ## with anonymous functions with more than 1 argument.  Example of possible unintended behavior - the user-provided variable is used for both and x and y in this example.
+#' ## with anonymous functions with more than 1 argument.  
+#' ## Example of possible unintended behavior - the user-provided variable is used for both and x and y in this example.
 #' smartAgg(mtcars, by='cyl', function(x,y) sum(x*y), c('drat', 'mpg', 'disp'))
 #' with(mtcars[mtcars$cyl==6,], c(sum(drat*drat), sum(mpg*mpg), sum(carb*carb))) 
 #' 
-#' ## demonstrating speed gain of smartAgg using data.table over \code{aggregate}
+#' ## demonstrating speed gain of smartAgg using data.table over aggregate
 #' n <- 300000
 #' df <- data.frame(x1=rnorm(n), x2=rbinom(n,5,0.5), x3=sample(letters, n, replace=T))
 #' system.time(aggFast <- smartAgg(df, by='x3', 'mean', c('x1', 'x2')))
