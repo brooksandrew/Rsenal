@@ -13,7 +13,7 @@ a vector of attributes that correspond in order with the nodes in your igraph
 }
 \description{
 This function sorts a series from beginning to end.  It uses each observations place in the quantile to assign it a score.
-useful for transforming variables into the same units (0-1)
+useful for transforming variables into the same units (0-1).  Handles NAs
 }
 \examples{
 cbind(quantileScore(mtcars$mpg), mtcars$mpg)

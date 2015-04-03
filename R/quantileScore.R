@@ -2,7 +2,7 @@
 #' @title Quantile scoring function for continuous or integer valued data
 #' 
 #' @description This function sorts a series from beginning to end.  It uses each observations place in the quantile to assign it a score.
-#' useful for transforming variables into the same units (0-1)
+#' useful for transforming variables into the same units (0-1).  Handles NAs 
 #' 
 #' @param x numeric vector to scale
 #' @return a vector of attributes that correspond in order with the nodes in your igraph
@@ -13,11 +13,13 @@
 #' cbind(quantileScore(mtcars$cyl), mtcars$cyl)
 
 quantileScore <- function(x) {
+  xo <- x
+  x <- x[is.na(x)==F]
   xs <- data.frame(x=sort(x), id=1:length(x), stringsAsFactors=F)
   xsd <- xs[duplicated(xs$x)==F,]
   xsd$q <- (xsd$id)/length(x)
-  xs$score <- xsd$q[match(x, xsd[,1])]
-  return(xs$score)
+  ret <- xsd$q[match(xo, xsd[,1])]
+  return(ret)
 }
 
 
