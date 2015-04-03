@@ -37,6 +37,6 @@ quantileScore <- function(x) {
 #' cbind(quantileFeatureScore(mtcars$cyl), mtcars$cyl)
 
 quantileFeatureScore <- function(x, wq=0.5, wf=0.5){
-  ret <- wq*quantileScore(x) + wf*(x-min(x))/(max(x)-min(x))
+  ret <- wq*quantileScore(x) + wf*(x-min(x, na.rm=T))/(max(x, na.rm=T)-min(x, na.rm=T))
   return(ret)
 }
