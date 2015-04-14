@@ -7,7 +7,7 @@
 #' @return association rules in a data.frame
 #' @export
 #' @examples
-#' require('arules')
+#' library('arules')
 #' data("Adult")
 #' ar <- apriori(Adult, parameter = list(supp = 0.5, conf = 0.9, target = "rules"))
 #' df<-rules2df(ar)
