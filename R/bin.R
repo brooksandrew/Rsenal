@@ -58,7 +58,7 @@ depthbin <- function(ser, nbins=10, qtype=7, digits=10, labelRange=T, labelPct=F
   rawlev <- levels(returnser)
   if (labelRange==T) levels(returnser) <- paste0(levels(returnser), rawlev)
   if (labelOrder==T) levels(returnser) <- paste0(levels(returnser), ' ', 1:length(rawlev), '/', length(rawlev))
-  if (labelPct==T) levels(returnser) <- paste0(levels(returnser), ' ', paste0('(', as.character(round(table(returnser)/length(returnser)*100, 4)), '%)'))
+  if (labelPct==T) levels(returnser) <- paste0(levels(returnser), ' ', paste0('(', as.character(round(table(returnser)/length(returnser)*100, 1)), '%)'))
   levels(returnser) <- sapply(levels(returnser), function(x) substr(x, sapply(rawlev, nchar)+1, nchar(x))) # removing original
   return(returnser)
 }
