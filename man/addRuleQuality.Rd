@@ -3,7 +3,7 @@
 \alias{addRuleQuality}
 \title{Add quality measures to association rules}
 \usage{
-addRuleQuality(trans, rules, include = NULL, exclude = NULL)
+addRuleQuality(trans, rules, include = NULL, exclude = "improvement")
 }
 \arguments{
 \item{trans}{transaction set (s4 class from arules package)}
@@ -12,7 +12,7 @@ addRuleQuality(trans, rules, include = NULL, exclude = NULL)
 
 \item{include}{character vector specifying which quality measures to include.  Default is to include everything.}
 
-\item{exclude}{character vector specifying which quality measures to exclude. Default is to exclude none.}
+\item{exclude}{character vector specifying which quality measures to exclude. Default is to exclude 'improvement' because it seems to be slow.}
 }
 \value{
 ruleset with additional quality measures
