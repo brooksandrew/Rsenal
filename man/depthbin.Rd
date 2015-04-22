@@ -3,7 +3,8 @@
 \alias{depthbin}
 \title{Equal depth binning}
 \usage{
-depthbin(ser, nbins = 10, qtype = 7, digits = 10, labelRange = T)
+depthbin(ser, nbins = 10, qtype = 7, digits = 10, labelRange = T,
+  labelPct = F, labelOrder = F)
 }
 \arguments{
 \item{ser}{numeric vector to bin}
@@ -14,7 +15,11 @@ depthbin(ser, nbins = 10, qtype = 7, digits = 10, labelRange = T)
 
 \item{digits}{number, number of digits to display in bin categories}
 
-\item{labelRange}{logical: \code{TRUE} assigns a numeric score/ranking (ex. 1/3, 2/3, or 3/3 if 3 bins) to each bin. \code{FALSE} keeps the numeric range for each bin as the factor label}
+\item{labelRange}{logical: \code{TRUE} assigns a numeric score/ranking (ex. 1/3, 2/3, or 3/3 if 3 bins) to each bin. Can be combined with \code{labelOrder} and \code{labelPct}}
+
+\item{labelPct}{logical: \code{TRUE} appends the percent of observations assigned to the bin to the factor level (name). Can be combined with \code{labelOrder} and \code{labelRange}}
+
+\item{labelOrder}{logical: \code{TRUE} appends the ordinal position of the bin to the factor level (name).  Can be combined with \code{labelPct} and \code{labelRange}}
 }
 \value{
 ordered factor vector with bins
@@ -37,6 +42,11 @@ summary(binned2)
 x3 <- round(abs(log(abs(rnorm(1000)))))
 binned3 <- depthbin(x3, nbins=5)
 summary(binned3)
+
+## including more information in category names (levels of factor variable)
+x4 <- round(abs(log(abs(rnorm(1000)))))
+binned4 <- depthbin(x4, nbins=3, labelRange=T, labelPct=T, labelOrder=T)
+summary(binned4)
 }
 \seealso{
 \code{\link{quantile}}

@@ -5,7 +5,9 @@
 #' @param nbins number of bins desired
 #' @param qtype an integer between 1 and 9 selecting one of the nine quantile algorithms detailed below to be used.  See \code{\link{quantile}} for more details.  Default is 7.
 #' @param digits number, number of digits to display in bin categories
-#' @param labelRange logical: \code{TRUE} assigns a numeric score/ranking (ex. 1/3, 2/3, or 3/3 if 3 bins) to each bin. \code{FALSE} keeps the numeric range for each bin as the factor label
+#' @param labelRange logical: \code{TRUE} assigns a numeric score/ranking (ex. 1/3, 2/3, or 3/3 if 3 bins) to each bin. Can be combined with \code{labelOrder} and \code{labelPct}
+#' @param labelPct logical: \code{TRUE} appends the percent of observations assigned to the bin to the factor level (name). Can be combined with \code{labelOrder} and \code{labelRange}
+#' @param labelOrder logical: \code{TRUE} appends the ordinal position of the bin to the factor level (name).  Can be combined with \code{labelPct} and \code{labelRange}
 #' 
 #' @seealso \code{\link{quantile}}
 #' @return ordered factor vector with bins
@@ -26,8 +28,13 @@
 #' x3 <- round(abs(log(abs(rnorm(1000)))))
 #' binned3 <- depthbin(x3, nbins=5)
 #' summary(binned3)
+#' 
+#' ## including more information in category names (levels of factor variable)
+#' x4 <- round(abs(log(abs(rnorm(1000)))))
+#' binned4 <- depthbin(x4, nbins=3, labelRange=T, labelPct=T, labelOrder=T)
+#' summary(binned4)
 
-depthbin <- function(ser, nbins=10, qtype=7, digits=10, labelRange=T) {
+depthbin <- function(ser, nbins=10, qtype=7, digits=10, labelRange=T, labelPct=F, labelOrder=F) {
   cutpts <- quantile(ser, probs=seq(0, 1, 1/nbins), na.rm=T, type=qtype)
   if(length(unique(cutpts))==nbins+1) {
     returnser <- cut(ser, breaks=cutpts, right=T, include.lowest=T)  
@@ -44,7 +51,15 @@ depthbin <- function(ser, nbins=10, qtype=7, digits=10, labelRange=T) {
     cutpts <- c(unique(cutpts), alldup)
     returnser <- cut(ser, breaks=cutpts, include.lowest=T, dig.lab=digits, right=F)
   }
-  if (labelRange==F) levels(returnser) <- paste0(1:length(levels(returnser)), '/', length(levels(returnser)))
+  if(sum(labelRange, labelPct, labelOrder)==0) {
+    labelRange <- T
+    warning('arguments labelRange, labelOrder, labelPct should not all be set to FALSE. Setting labelRange to TRUE.')
+  }
+  rawlev <- levels(returnser)
+  if (labelRange==T) levels(returnser) <- paste0(levels(returnser), rawlev)
+  if (labelOrder==T) levels(returnser) <- paste0(levels(returnser), ' ', 1:length(rawlev), '/', length(rawlev))
+  if (labelPct==T) levels(returnser) <- paste0(levels(returnser), ' ', paste0('(', as.character(round(table(returnser)/length(returnser)*100, 4)), '%)'))
+  levels(returnser) <- sapply(levels(returnser), function(x) substr(x, sapply(rawlev, nchar)+1, nchar(x))) # removing original
   return(returnser)
 }
 
