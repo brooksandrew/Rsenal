@@ -19,7 +19,7 @@ Note this function only currently works when the itemsets are of size 1 on the L
 \examples{
 library('arules')
 data("Adult")
-ar <- apriori(Adult, parameter = list(supp = 0.5, conf = 0.9, target = "rules"))
-df<-rules2df(ar)
+ar <- apriori(Adult, parameter = list(supp = 0.5, conf = 0.6, target = "rules", minlen=2))
+df <- rules2df(ar, list=T)
 }
 

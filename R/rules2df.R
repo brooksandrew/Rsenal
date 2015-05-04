@@ -9,8 +9,8 @@
 #' @examples
 #' library('arules')
 #' data("Adult")
-#' ar <- apriori(Adult, parameter = list(supp = 0.5, conf = 0.9, target = "rules"))
-#' df<-rules2df(ar)
+#' ar <- apriori(Adult, parameter = list(supp = 0.5, conf = 0.6, target = "rules", minlen=2))
+#' df <- rules2df(ar, list=T)
 
 rules2df <- function(rules, list=F){  
   df <- as(rules, 'data.frame')
@@ -23,8 +23,19 @@ rules2df <- function(rules, list=F){
   df$rhs <- gsub(pattern='}', replacement='', x=df$rhs)
   
   if(list==T){
-    df$lhs <- strsplit(as.character(df$lhs), split=',')
-    df$rhs <- strsplit(as.character(df$rhs), split=',')
+    p <- rules@lhs@data@p
+    i <- rules@lhs@data@i+1
+    lhsItems <- unlist(rules@lhs@itemInfo@.Data)
+    lhsL <- list()
+    for(j in 2:length(p)) lhsL[[j-1]] <- lhsItems[i[(p[j-1]+1):(p[j])]]
+    df$lhs <- lhsL
+    
+    p <- rules@rhs@data@p
+    i <- rules@rhs@data@i+1
+    rhsItems <- unlist(rules@rhs@itemInfo@.Data)
+    rhsL <- list()
+    for(j in 2:length(p)) rhsL[[j-1]] <- rhsItems[i[(p[j-1]+1):(p[j])]]
+    df$rhs <- rhsL
   }
   return(df)
 }
