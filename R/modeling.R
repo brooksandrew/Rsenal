@@ -178,7 +178,7 @@ plotBestglm <- function(bglm, rc=2) {
 #' glm.out <- uniglm(df=mtcars, yv='vs', xv=c('hp','drat','cyl','mpg','wt'), xvlab=longnames)
 
 uniglm <- function(df, yv, xv, file=NULL, sortby='aic', xvlab=NULL, test=T){
-  mat <- data.frame(matrix(nrow=25*length(xv), ncol=11, dimnames=list(NULL, c('Predictor', 'Name','ref', 'coef', 'oddsRatio', 'p', 'pstar', 'aic', 'c', 'Chisq_pvalue', 'Chisq_pstar'))))
+  mat <- data.frame(matrix(nrow=25*length(xv), ncol=12, dimnames=list(NULL, c('Predictor', 'Name', 'fac', 'ref', 'coef', 'oddsRatio', 'p', 'pstar', 'aic', 'c', 'Chisq_pvalue', 'Chisq_pstar'))))
   i<-0
   for(x in xv){
     formt <- makeForm(yv, x)
@@ -197,6 +197,8 @@ uniglm <- function(df, yv, xv, file=NULL, sortby='aic', xvlab=NULL, test=T){
           regv <- gsub(x, '', names(reg$coef))
           uxv <- unique(df[,x])
           mat$ref[i] <- setdiff(uxv, regv)
+          mat$Predictor[i] <- x
+          mat$fac[i] <- gsub(x, '', names(reg$coef[j])) 
         } 
         
         if(test==T){
@@ -219,7 +221,9 @@ uniglm <- function(df, yv, xv, file=NULL, sortby='aic', xvlab=NULL, test=T){
   }
   mat<-mat[1:i,]
   mat$ref[is.na(mat$ref)] <- ''
+  mat$fac[is.na(mat$fac)] <- ''
   if(sum(mat$ref=='')==nrow(mat)) mat <- mat[, setdiff(names(mat), 'ref')]
+  if(sum(mat$fac=='')==nrow(mat)) mat <- mat[, setdiff(names(mat), 'fac')]
   decreasingTF <- ifelse(sortby %in% c('c'), T, F)
   mat <- mat[order(mat[,sortby], decreasing=decreasingTF),] 
   if(is.null(file)==F) write.csv(mat, file=file)
