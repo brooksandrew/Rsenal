@@ -13,7 +13,12 @@ shinyTable <- function(df) {
   shinyApp(
     shinyUI(basicPage(
       h2(paste0(deparse(substitute(df)))),
-      dataTableOutput('mytable')
+      sidebarPanel(
+        checkboxGroupInput('show_vars', 'Columns to show', names(df), selected=names(df))
+        ),
+      mainPanel(
+        dataTableOutput('mytable')
+        )
     )),
     server = function(input, output) {
       output$mytable = renderDataTable({
@@ -22,3 +27,6 @@ shinyTable <- function(df) {
     }
   )
 }
+
+
+shinyTable(mtcars)
