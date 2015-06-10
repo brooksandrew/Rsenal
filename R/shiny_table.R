@@ -35,9 +35,10 @@ shinyTable <- function(df) {
                                      } else {dfp <- df1
                                              output$querystatus <- renderText({'query unsuccessful :( <br/> (showing full dataset)'})
                                      }
-        dfp
-      })
+        dfp},
+        options=list(lengthMenu=list(c(25,50,100,500,1000,5000,-1), c('25', '50', '100', '500', '1000', '5000', 'All')),
+                     pageLength=500)
+      )
     }
   )
 }
-
