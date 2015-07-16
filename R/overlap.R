@@ -16,15 +16,7 @@
 
 overlap <- function(x1, x2, na.rm=F, wordy=T, x1name=NULL, x2name=NULL) {
   
-  if(class(x1) != class(x2)) {
-    warning('classes of x1 and x2 are not equal.  Coercing both to character')
-    if(class(x1)!='character') x1 <- as.character(x1)
-    if(class(x2)!='character') x2 <- as.character(x2) 
-  }
-  
-  x1name <- ifelse(is.null(x1name), 'x1', x1name)
-  x2name <- ifelse(is.null(x2name), 'x2', x2name)
-  
+  # printing which variable is which.
   if(wordy==T) {
     cat(paste0('x1 is ', deparse(substitute(x1))))
     cat('\n')
@@ -32,13 +24,25 @@ overlap <- function(x1, x2, na.rm=F, wordy=T, x1name=NULL, x2name=NULL) {
     cat('\n\n')
   }
   
+  # checking for class mismatch
+  if(class(x1) != class(x2)) {
+    warning('classes of x1 and x2 are not equal.  Coercing both to character')
+    if(class(x1)!='character') x1 <- as.character(x1)
+    if(class(x2)!='character') x2 <- as.character(x2) 
+  }
+  
+  # adding optional vector names
+  x1name <- ifelse(is.null(x1name), 'x1', x1name)
+  x2name <- ifelse(is.null(x2name), 'x2', x2name)
+  
+  # dealing w NAs
   if(na.rm==T){
     x1 <- x1[is.na(x1)==F]
     x2 <- x2[is.na(x2)==F]
   }
 
+  # creating statistics to return
   ret <- list()
-  
   ret[[sprintf('%s exist in %s', x1name, x2name)]] <- c(
       length(x1), 
       length(x2),
