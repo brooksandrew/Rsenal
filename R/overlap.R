@@ -16,6 +16,12 @@
 
 overlap <- function(x1, x2, na.rm=F, wordy=T, x1name=NULL, x2name=NULL) {
   
+  if(class(x1) != class(x2)) {
+    warning('classes of x1 and x2 are not equal.  Coercing both to character')
+    if(class(x1)!='character') x1 <- as.character(x1)
+    if(class(x2)!='character') x2 <- as.character(x2) 
+  }
+  
   x1name <- ifelse(is.null(x1name), 'x1', x1name)
   x2name <- ifelse(is.null(x2name), 'x2', x2name)
   
