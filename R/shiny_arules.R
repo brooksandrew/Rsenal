@@ -79,7 +79,7 @@ arulesApp <- function (dataset, bin=T, vars=5) {
         sliderInput("conf", "Confidence:", min = 0, max = 1, value = 0.5 , step = 1/10000), br(),
         selectInput('sort', label='Sorting Criteria:', choices = c('lift', 'confidence', 'support')), br(), br(),
         numericInput("minL", "Min. items per set:", 2), br(), 
-        numericInput("maxL", "Max. items per set::", 10), br(),
+        numericInput("maxL", "Max. items per set::", 3), br(),
         radioButtons('lhsv', label='LHS variables', choices=c('All', 'Subset')), br(),
         radioButtons('rhsv', label='RHS variables', choices=c('All', 'Subset')), br(),
         downloadButton('downloadData', 'Download Rules as CSV')
