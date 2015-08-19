@@ -14,7 +14,7 @@
 #' quantile_df(mtcars$mpg, seq(0,1,.1), names=T)
 #' quantile_df(mtcars$mpg, seq(0,1,.2), colname='mpg')
 
-quantile_df <- function(x, probs, na.rm =F, names=F, type=7, colname=NULL, ...){
+quantile_df <- function(x, probs=seq(0,1,.05), na.rm =F, names=F, type=7, colname=NULL, ...){
   z <- quantile(x, probs, na.rm, names, type)
   probsprint <- paste0(round(probs*100,3), '%')
   df <- data.frame(quantile=probsprint, values=z)

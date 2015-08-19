@@ -3,8 +3,8 @@
 \alias{quantile_df}
 \title{Pretty print quantiles}
 \usage{
-quantile_df(x, probs, na.rm = F, names = F, type = 7, colname = NULL,
-  ...)
+quantile_df(x, probs = seq(0, 1, 0.05), na.rm = F, names = F, type = 7,
+  colname = NULL, ...)
 }
 \arguments{
 \item{x}{numeric vector to calculate quantile with}
