@@ -256,33 +256,37 @@ uniglm <- function(df, yv, xv, file=NULL, sortby='aic', xvlab=NULL, test=T){
 #' barplot(pq$hitRate, names=pq$predRange, ylab='True Positive Hit Rate', las=2, cex.names=.7)
 #' barplot(pq$predMax-pq$predMin, pq$hitRate, names=pq$predRange, ylab='prediction', las=2, cex.names=.7)
 
+(pq <- predQuantile(ytest=truth, testPred=pred, n=5))
+
 predQuantile <- function(model=NULL, xtest=NULL, ytest, n=5, roundText=3, testPred=NULL, fw=NULL){
   if(is.null(testPred)) {pred <- predict(model, xtest)
   } else {pred <- testPred}
   
-  tf <- data.frame(pred=pred, actual=ytest)
+  tf <- data.frame(pred=pred, hits=ytest)
   tf <- tf[order(tf$pred),]
   if(is.null(fw)) {tf$cat <- sort(rep(1:n, ceiling(nrow(tf)/n))[1:nrow(tf)])
   } else {tf$cat <- cut(tf$pred, breaks=fw)}
   
-  aggSum <- aggregate(actual~cat, data=tf, sum)
-  aggLength <- aggregate(actual~cat, data=tf, length)
+  aggSum <- aggregate(hits~cat, data=tf, sum)
+  aggLength <- aggregate(hits~cat, data=tf, length)
   aggRange <- aggregate(pred~cat, data=tf, range)
   aggRange <- cbind(aggRange[,1], data.frame(aggRange[,2]))
   aggRangeText <- aggregate(pred~cat, data=tf, function(x) paste(round(range(x), roundText), collapse=' to '))
   
-  names(aggLength)[2] <- 'obs'
+  names(aggLength)[2] <- 'N'
   names(aggRange) <- c('cat', 'predMin', 'predMax')
   names(aggRangeText)[2] <- 'predRange'
   
   agg <- merge(aggSum, aggLength, by='cat')
-  agg$hitRate <- agg$actual/agg$obs
+  agg$hitRate <- agg$hits/agg$N
   agg <- merge(agg, aggRange, by='cat')
   agg <- merge(agg, aggRangeText, by='cat')
   
-  agg$cumHitsPct <- rev(cumsum(rev(agg$actual)/sum(agg$actual)))
-  agg$cumHitRate <- rev(cumsum(rev(agg$actual))/cumsum(rev(agg$obs)))
-  agg$cumObsPct <- rev(cumsum(rev(agg$obs)/sum(agg$obs)))
+  guessrate <- sum(ytest==1)/length(ytest)
+  agg$cumHitsPct <- rev(cumsum(rev(agg$hits)/sum(agg$hits)))
+  agg$cumHitRate <- rev(cumsum(rev(agg$hits))/cumsum(rev(agg$N)))
+  agg$cumNPct <- rev(cumsum(rev(agg$N)/sum(agg$N)))
+  agg$cumLift <- agg$cumHitRate/guessrate
   
   ##correcting for cutoffs with zero
   if(!is.null(fw)) {
@@ -290,6 +294,7 @@ predQuantile <- function(model=NULL, xtest=NULL, ytest, n=5, roundText=3, testPr
     print(paste('no scores in these ranges',a))
     agg$cutoff <- fw[which(levels(tf$cat) %in% tf$cat)]
   }
+  agg <- agg[nrow(agg):1,]
   return(agg)
 }
 
