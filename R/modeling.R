@@ -256,8 +256,6 @@ uniglm <- function(df, yv, xv, file=NULL, sortby='aic', xvlab=NULL, test=T){
 #' barplot(pq$hitRate, names=pq$predRange, ylab='True Positive Hit Rate', las=2, cex.names=.7)
 #' barplot(pq$predMax-pq$predMin, pq$hitRate, names=pq$predRange, ylab='prediction', las=2, cex.names=.7)
 
-(pq <- predQuantile(ytest=truth, testPred=pred, n=5))
-
 predQuantile <- function(model=NULL, xtest=NULL, ytest, n=5, roundText=3, testPred=NULL, fw=NULL){
   if(is.null(testPred)) {pred <- predict(model, xtest)
   } else {pred <- testPred}
