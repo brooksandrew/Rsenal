@@ -4,7 +4,7 @@
 \title{Partial Dependence Spark Lines (multiple variables)}
 \usage{
 partialDepAll(model, df, n = 10, xvars = NULL, target.class = "1",
-  ci = c(0.9, 0.5, 0.3), plot = T, data = T, plot.yaxis.fixed = T)
+  ci = c(0.75), plot = T, data = T, plot.yaxis.fixed = T, wordy = T)
 }
 \arguments{
 \item{model}{model object used to generate predictions.  Currently only built and tested for random forest.}
@@ -23,6 +23,10 @@ Note: this number is also how many replicates of \code{df} must be created and s
 \item{plot}{logical: plot sparklines (\code{TRUE}), or no (\code{FALSE})}
 
 \item{data}{logical: return summary table of output. yes (\code{TRUE}), or no (\code{FALSE})}
+
+\item{plot.yaxis.fixed}{logical: \code{TRUE} uses same yaxis for all x variables (biggest max and smallest min across all variables).  code{\FALSE} uses variable specific axes.}
+
+\item{wordy}{logical: print progress to the console}
 }
 \value{
 list of output and plot
@@ -35,8 +39,10 @@ realistic idea of the magnitude and direction of the x variable on the response.
 }
 \examples{
 library('randomForest')
+library('data.table')
+library('ggplot2')
 DF <- mtcars
-DF$vs <- factor(df$vs)
+DF$vs <- factor(DF$vs)
 rf <- randomForest(vs~mpg+cyl+drat+qsec+disp+gear+carb+hp, DF, ntrees=100)
 pda <- partialDepAll(model=rf, df=DF, n=10)
 }

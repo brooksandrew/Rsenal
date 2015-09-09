@@ -65,6 +65,8 @@ partialDep <- function(model, df, xvar, n=10, target.class='1', ci=c(.9,.5,.3)) 
 #' @param ci numeric: specify any confidence intervals around the median response.  
 #' @param plot logical: plot sparklines (\code{TRUE}), or no (\code{FALSE})
 #' @param data logical: return summary table of output. yes (\code{TRUE}), or no (\code{FALSE})
+#' @param plot.yaxis.fixed logical: \code{TRUE} uses same yaxis for all x variables (biggest max and smallest min across all variables).  code{\FALSE} uses variable specific axes.
+#' @param wordy logical: print progress to the console
 #' @seealso \code{\link{partialDep}}
 #' @return list of output and plot
 #' @import randomForest
@@ -75,24 +77,26 @@ partialDep <- function(model, df, xvar, n=10, target.class='1', ci=c(.9,.5,.3)) 
 #' @examples
 #' library('randomForest')
 #' DF <- mtcars
-#' DF$vs <- factor(df$vs)
+#' DF$vs <- factor(DF$vs)
 #' rf <- randomForest(vs~mpg+cyl+drat+qsec+disp+gear+carb+hp, DF, ntrees=100)
 #' pda <- partialDepAll(model=rf, df=DF, n=10)
 
-partialDepAll <- function(model, df, n=10, xvars=NULL, target.class='1', ci=c(.9,.5,.3), plot=T, data=T, plot.yaxis.fixed=T) {
+partialDepAll <- function(model, df, n=10, xvars=NULL, target.class='1', ci=c(.75), plot=T, data=T, plot.yaxis.fixed=T, wordy=T) {
   # currently only works with random forest
   if(is.null(xvars)) xvars <- names(model$forest$ncat)
   L <- list()
   for(i in xvars){
     tmpdf <- data.table(partialDep(model=model, df=df, xvar=i, n=n, target.class=target.class, ci=ci))
     tmpdf[,xname:=i]
+    tmpdf[,x:=length(L)+1] # keeping order of xvars
     L[[i]] <- tmpdf
+    if(wordy==T) cat('.')
   }
   ret <- rbindlist(L)
+  ret[,xname:=factor(xname, levels=xvars)] # to conserve order using facet_wrap
   
   # producing data for sparklines plot
   pdplot <- ret
-  pdplot[,x:=as.numeric(factor(xname))] # x is the variable being sequenced through.  Each x only once
   pdplot[,y:=rep(rep(1:n, each=length(unique(pdplot$ci))), length(xvars))] 
   setkey(pdplot,x,ci,y)
   pdplot[,preddiff:=pred-shift(pred), by=.(x,ci)] # getting absolute pred of change
@@ -101,23 +105,34 @@ partialDepAll <- function(model, df, n=10, xvars=NULL, target.class='1', ci=c(.9
   
   # plotting spark lines
   if(plot==T){
+    lwdlen <- c(rep(5, 3), rep(4, 6), rep(3, 9), rep(2, length(xvars)))[length(xvars)]
     wd <- reshape(pdplot, idvar = c('x', 'y'), v.names='pred', timevar="ci", direction = "wide") # reshape wide for geom_ribbons
     gg <- ggplot()
     for(cl in ci) gg <- gg + geom_ribbon(data=wd, aes_string(x='y', ymin=paste0('pred.', 0.5-cl/2), ymax=paste0('pred.', 0.5+cl/2)), alpha=0.75*1/length(ci), fill='gray')
-    gg <- gg + geom_line(data=pdplot[ci==0.5,], aes(x=y, y=pred, colour=pred), lwd=5) +
+    gg <- gg + geom_line(data=pdplot[ci==0.5,], aes(x=y, y=pred, colour=pred), lwd=lwdlen) +
       facet_wrap(~xname, scales=ifelse(plot.yaxis.fixed==T, 'fixed', 'free')) +
-      geom_rug(data=pdplot[ci==0.5,], aes(x=cntrug)) + 
+      geom_rug(data=pdplot[ci==0.5,], aes(x=jitter(cntrug))) + 
       scale_colour_gradientn(colours=colorRampPalette(c('firebrick', 'grey', 'forestgreen'))(n)) +
-      theme_bw() 
+      theme_bw() + xlab('') + ylab('prediction')
     plot(gg)
   }
   
   if(data==T){
-    retL <- list(mediantab=data.frame(ret),
-                 pdplot=data.frame(pdplot),
+    retL <- list(pdplot=data.frame(pdplot),
                  cilev=data.frame(ci),
-                 n=n
+                 n=n,
+                 ggobj=gg
     )
     return(retL)
   }
 }
+
+library('randomForest')
+library('data.table')
+library('ggplot2')
+DF <- mtcars
+DF$vs <- factor(DF$vs)
+rf <- randomForest(vs~mpg+cyl+drat+qsec+disp+gear+carb+hp, DF, ntrees=100)
+pda <- partialDepAll(model=rf, df=DF, n=10, xvars=c( 'mpg', 'cyl', 'qsec',  'drat'), ci=0.5)
+
+
