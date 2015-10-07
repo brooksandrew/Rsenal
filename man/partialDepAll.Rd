@@ -39,8 +39,6 @@ realistic idea of the magnitude and direction of the x variable on the response.
 }
 \examples{
 library('randomForest')
-library('data.table')
-library('ggplot2')
 DF <- mtcars
 DF$vs <- factor(DF$vs)
 rf <- randomForest(vs~mpg+cyl+drat+qsec+disp+gear+carb+hp, DF, ntrees=100)
