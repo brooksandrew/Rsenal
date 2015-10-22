@@ -41,7 +41,7 @@ horseRaceModel <- function(x, y, n=10, trainPct=0.75, liftQuantile=.04) {
     
     ## Logistic
     xvar_toplasso <- row.names(coef(fitlasso))[which(abs(coef(fitlasso, s=cvLasso$lambda.min))>0)]
-    df4glm <- data.frame(cbind(y=ytr, data.frame(xtr)[,intersect(colnames(xtr), xvar_toplasso)]))
+    df4glm <- data.frame(y=ytr, data.frame(xtr)[,intersect(colnames(xtr), xvar_toplasso), drop=FALSE])
     fitglm <- glm(makeForm('y', intersect(colnames(xtr), xvar_toplasso)), data=df4glm, family=binomial(logit))
     predGlm <- predict(fitglm, newdata=xte, type='response')
     pqGlm <- predQuantile(ytest=ynte, testPred=predGlm, n=round(1/liftQuantile))
@@ -107,8 +107,9 @@ data(AdultUCI)
 df <- AdultUCI[1:1000,]
 df <- df[complete.cases(df),]
 names(df) <- gsub('\\-', '_', names(df)) # dashes mess things up
-# still need to ge
-hr <- horseRaceModel(x=df[,c('age', 'education_num', 'capital_gain', 'capital_loss', 'hours_per_week')], y=as.numeric(df$sex)-1, n=10, trainPct=.75, liftQuantile=.1)
+# still need to handle categorical variables
+hr <- horseRaceModel(x=df[,c('age', 'education_num', 'capital_gain', 'capital_loss', 'hours_per_week')], 
+                     y=as.numeric(df$sex)-1, n=10, trainPct=.75, liftQuantile=.1)
 
 plot(hr, measure='lift')
 
