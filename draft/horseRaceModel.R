@@ -12,7 +12,7 @@ horseRaceModel <- function(x, y, n=10, trainPct=0.75, liftQuantile=.04) {
   if(class(y) %in% c('character', 'factor')) yn <- as.numeric(as.character(y)) else yn <- y
   if(max(y)>1 | min(y)<0) stop('y must be between 0 and 1') 
   
-  cat(paste(rep('.', n), collapse='')); cat('\n')
+  pb <- txtProgressBar(min=0, max=n, style=3, width=n)
   
   # setting up return object
   ret <- replicate(2, data.frame(rf=rep(NA, n), lasso=rep(NA, n), glm=rep(NA, n), ensemble=rep(NA,n)), simplify=F)
@@ -74,7 +74,7 @@ horseRaceModel <- function(x, y, n=10, trainPct=0.75, liftQuantile=.04) {
       ret$lasso_coef <- cbind(ret$lasso_coef, as.matrix(coef(fitlasso, s=cvLasso$lambda.min))) 
     }
     
-    cat('.')
+    setTxtProgressBar(pb, i)
   }
   
   ret$lasso_coef <- as(ret$lasso_coef, 'dgCMatrix')
@@ -109,7 +109,7 @@ df <- df[complete.cases(df),]
 names(df) <- gsub('\\-', '_', names(df)) # dashes mess things up
 # still need to handle categorical variables
 hr <- horseRaceModel(x=df[,c('age', 'education_num', 'capital_gain', 'capital_loss', 'hours_per_week')], 
-                     y=as.numeric(df$sex)-1, n=10, trainPct=.75, liftQuantile=.1)
+                     y=as.numeric(df$sex)-1, n=30, trainPct=.75, liftQuantile=.1)
 
 plot(hr, measure='lift')
 
