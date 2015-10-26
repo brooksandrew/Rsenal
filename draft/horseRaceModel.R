@@ -1,5 +1,18 @@
-#' @Description This function performs repeated sub-sampling cross-validation using 4 different models and
-#' saves the AUC and lift on the top 4% for each model at each iteration.
+#' @title 
+#' @description This function performs repeated sub-sampling cross-validation using 3 different models and
+#' saves the AUC and lift for each model at each iteration.  Models used are Random Forest, LASSO Regression, logistic regression (using 
+#' LASSO for variable selection).  An ensemble of the LASSO and Random Forest is also included. 
+#' @param x data.frame or data.table of predictor variables
+#' @param y vector target variable, binary 0 or 1. 
+#' @param n number, number of iterations
+#' @param trainpct numeric scalar.  percent of data to be used for training at each iteration.
+#' @param liftQuantile numeric scalar.  quantile to be used for assessing lift.
+#' @return horseRace S3 object.
+#' @export
+#' @examples
+#' mtcars2 <- mtcars
+#' for(i in 1:ncol(mtcars2)) mtcars2[sample(nrow(mtcars2), sample(1:5,1), replace=T),i] <- NA
+#' missdf(mtcars2)
 
 library('glmnet')
 library('randomForest')
@@ -27,20 +40,23 @@ horseRaceModel <- function(x, y, n=10, trainPct=0.75, liftQuantile=.04) {
     ytr <- y[itrain]; yntr <- yn[itrain]
     yte <- y[itest]; ynte <- yn[itest]
     
-    ## LASSO
-    
+    # if we have factor variables, dummy up columns for LASSO
     if(length(setdiff(sapply(xtr, class), c('numeric', 'integer')))>0) {
-      xtr <- model.matrix(~.-1, xtr)
-      xte <- model.matrix(~.-1, xte)
+      xtr_d <- model.matrix(~.-1, xtr)
+      xte_d <- model.matrix(~.-1, xte)
+      colnames(xtr_d) <- gsub('\\-', '\\_', colnames(xtr_d))
+      colnames(xte_d) <- gsub('\\-', '\\_', colnames(xte_d))
+      facvars <- names(attr(xtr_d, "contrasts"))
     }
     
-    fitlasso <- glmnet(x=as.matrix(xtr), y=yntr, alpha=1, family='binomial')
-    cvLasso <- cv.glmnet(x=as.matrix(xtr), y=yntr, alpha=1, type.measure='deviance')
-    predLasso <- predict(fitlasso, s=cvLasso$lambda.min, newx=as.matrix(xte), type='response')[,1]
+    ## LASSO
+    fitlasso <- glmnet(x=as.matrix(xtr_d), y=yntr, alpha=1, family='binomial')
+    cvLasso <- cv.glmnet(x=as.matrix(xtr_d), y=yntr, alpha=1, type.measure='deviance')
+    predLasso <- predict(fitlasso, s=cvLasso$lambda.min, newx=as.matrix(xte_d), type='response')[,1]
     pqLasso <- predQuantile(ytest=ynte, testPred=predLasso, n=round(1/liftQuantile))
     
     ## Logistic
-    xvar_toplasso <- row.names(coef(fitlasso))[which(abs(coef(fitlasso, s=cvLasso$lambda.min))>0)]
+    xvar_toplasso <- row.names(coef(fitlasso))[which(abs(coef(fitlasso, s=cvLasso$lambda.min))>0)] # 
     df4glm <- data.frame(y=ytr, data.frame(xtr)[,intersect(colnames(xtr), xvar_toplasso), drop=FALSE])
     fitglm <- glm(makeForm('y', intersect(colnames(xtr), xvar_toplasso)), data=df4glm, family=binomial(logit))
     predGlm <- predict(fitglm, newdata=xte, type='response')
@@ -80,6 +96,8 @@ horseRaceModel <- function(x, y, n=10, trainPct=0.75, liftQuantile=.04) {
   ret$lasso_coef <- as(ret$lasso_coef, 'dgCMatrix')
   
   class(ret) <- 'horseRace'
+  attr(ret, 'n') <- n
+  
   return(ret)
 }
 
@@ -96,7 +114,25 @@ plot.horseRace <- function(object, measure){
     geom_point(size=4, shape=19) + ylab(measure) + ggtitle(measure) + theme_bw()
 }
 
-
+summary.horseRace <- function(object){
+  cat('AUC: \n')
+  dt <- data.frame(data.table(hr[['auc']])[,.(rf, lasso, glm, ensemble)][,lapply(.SD, function(x) quantile(x)[2:4])])
+  row.names(dt) <- c('25%', '50%', '75%')
+  print(dt)
+  
+  cat('\n')
+  cat('Lift: \n')
+  dt <- data.frame(data.table(hr[['lift']])[,.(rf, lasso, glm, ensemble)][,lapply(.SD, function(x) quantile(x)[2:4])])
+  row.names(dt) <- c('25%', '50%', '75%')
+  print(dt)
+  
+  cat('\n')
+  cat('variables chosen by LASSO: \n')
+  lassoB <- apply(as(hr$lasso_coef, 'matrix'), 1, function(x) sum(x>0))
+  lassoB <- lassoB[setdiff(names(lassoB), '(Intercept)')]
+  data.frame(N=lassoB[order(lassoB, decreasing=T)])
+}
+summary(hr)
 
 #' @examples
 #' \dontrun{
@@ -108,10 +144,11 @@ df <- AdultUCI[1:1000,]
 df <- df[complete.cases(df),]
 names(df) <- gsub('\\-', '_', names(df)) # dashes mess things up
 # still need to handle categorical variables
-hr <- horseRaceModel(x=df[,c('age', 'education_num', 'capital_gain', 'capital_loss', 'hours_per_week')], 
-                     y=as.numeric(df$sex)-1, n=30, trainPct=.75, liftQuantile=.1)
+hr <- horseRaceModel(x=df[,c('age', 'education_num', 'capital_gain', 'capital_loss', 'hours_per_week', 'race', 'workclass')], 
+                     y=as.numeric(df$sex)-1, n=8, trainPct=.75, liftQuantile=.1)
 
 plot(hr, measure='lift')
+summary(hr)
 
 #setdiff(names(df), 'sex')
 #c('capital_gain', 'hours_per_week','age')
