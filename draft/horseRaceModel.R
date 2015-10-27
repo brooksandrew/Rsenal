@@ -54,11 +54,11 @@ horseRaceModel <- function(x, y, n=10, trainPct=0.75, liftQuantile=.04) {
     cvLasso <- cv.glmnet(x=as.matrix(xtr_d), y=yntr, alpha=1, type.measure='deviance')
     predLasso <- predict(fitlasso, s=cvLasso$lambda.min, newx=as.matrix(xte_d), type='response')[,1]
     pqLasso <- predQuantile(ytest=ynte, testPred=predLasso, n=round(1/liftQuantile))
+    glmvars <- lassoDummyVarsToFactors(fitlasso=fitlasso, s=cvLasso$lambda.min, contrasts=names(attr(xtr_d, 'contrasts')), xtr=xtr)
     
     ## Logistic
-    xvar_toplasso <- row.names(coef(fitlasso))[which(abs(coef(fitlasso, s=cvLasso$lambda.min))>0)] # 
-    df4glm <- data.frame(y=ytr, data.frame(xtr)[,intersect(colnames(xtr), xvar_toplasso), drop=FALSE])
-    fitglm <- glm(makeForm('y', intersect(colnames(xtr), xvar_toplasso)), data=df4glm, family=binomial(logit))
+    df4glm <- data.frame(y=ytr, data.frame(xtr)[, glmvars, drop=FALSE])
+    fitglm <- glm(makeForm('y', intersect(colnames(xtr), glmvars)), data=df4glm, family=binomial(logit))
     predGlm <- predict(fitglm, newdata=xte, type='response')
     pqGlm <- predQuantile(ytest=ynte, testPred=predGlm, n=round(1/liftQuantile))
     
@@ -100,6 +100,44 @@ horseRaceModel <- function(x, y, n=10, trainPct=0.75, liftQuantile=.04) {
   
   return(ret)
 }
+
+######################
+## Helper Functions ##
+######################
+## NEEDS TO HANDLE ORDERED FACTORS  (LIKE EDUCATION)
+
+lassoDummyVarsToFactors <- function(fitlasso, s=cvLasso$lambda.min, contrasts=names(attr(xtr_d, 'contrasts')), xtr){
+  # grabbing the dummied variables chosen by lasso regression
+  ltmp <- coef(fitlasso, s=s)
+  lassoVars <- ltmp@Dimnames[[1]][2:ltmp@Dim[1]][ltmp@i]
+
+  # create mapping between factor variable (root) and it's dummied variable names
+  if(length(contrasts)>0) {
+    rl <- list()
+    for(i in contrasts) rl[[i]] <- paste(i, gsub('\\-', '\\_', unique(xtr[,i])), sep='')
+  }
+  
+  # creating list of just root (factor) variables for GLM
+  ret <- c()
+  for(i in lassoVars){
+    if(!i %in% names(xtr)) {
+      addvar <- names(rl)[[grep(i, rl)]]
+      if(addvar %in% ret) next
+      ret <- c(ret, addvar)
+    } else {
+      ret <- c(ret, i)
+    }
+  }
+  return(ret)
+}
+
+
+#lassoDummyVarsToFactors(fitlasso, s=cvLasso$lambda.min, contrasts=names(attr(xtr_d, 'contrasts')), xtr=xtr)
+
+
+######################
+## Methods ###########
+######################
 
 
 plot.horseRace <- function(object, measure){
@@ -144,7 +182,8 @@ df <- AdultUCI[1:1000,]
 df <- df[complete.cases(df),]
 names(df) <- gsub('\\-', '_', names(df)) # dashes mess things up
 # still need to handle categorical variables
-hr <- horseRaceModel(x=df[,c('age', 'education_num', 'capital_gain', 'capital_loss', 'hours_per_week', 'race', 'workclass')], 
+hr <- horseRaceModel(x=df[,c('age', 'capital_gain', 'capital_loss', 'hours_per_week', 
+                             'race', 'workclass', 'marital_status', 'occupation')], 
                      y=as.numeric(df$sex)-1, n=8, trainPct=.75, liftQuantile=.1)
 
 plot(hr, measure='lift')
