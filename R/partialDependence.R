@@ -129,4 +129,7 @@ partialDepAll <- function(model, df, n=10, xvars=NULL, target.class='1', ci=c(.7
   }
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e0540c64e57c093708e4a1a3d7c555d2ee585788

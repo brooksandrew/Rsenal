@@ -4,7 +4,7 @@
 \title{Pretty print quantiles}
 \usage{
 quantile_df(x, probs = seq(0, 1, 0.05), na.rm = F, names = F, type = 7,
-  colname = NULL, ...)
+  colname = NULL, round = NULL, ...)
 }
 \arguments{
 \item{x}{numeric vector to calculate quantile with}
@@ -18,6 +18,9 @@ quantile_df(x, probs = seq(0, 1, 0.05), na.rm = F, names = F, type = 7,
 \item{type,}{number, pass to quantile function}
 
 \item{colname,}{character, name of variable column in output}
+
+\item{round,}{integer, number of digits to round quantile value.
+passed to \code{digits} argument of \code{round} function}
 }
 \value{
 prettified data.frame of probabilities
@@ -29,5 +32,6 @@ Useful for R Markdown reports
 quantile_df(mtcars$mpg, seq(0,1,.1))
 quantile_df(mtcars$mpg, seq(0,1,.1), names=T)
 quantile_df(mtcars$mpg, seq(0,1,.2), colname='mpg')
+quantile_df(mtcars$mpg, round=1)
 }
 
