@@ -28,3 +28,4 @@ Imports:
     memoise,
     BBmisc
 Suggests:
+RoxygenNote: 5.0.1

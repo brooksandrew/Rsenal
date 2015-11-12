@@ -5,9 +5,12 @@
 #' Users filter rules to target only those with a certain variable on the RHS or LHS of the rule.
 #' Rule mining is computed using the \link{apriori} algorithm from \code{arules}.
 #' 
-#' @param dataset data.frame, this is the dataset that association rules will be mined from.  Each row is treated as a transaction.
+#' @param dataset data.frame, this is the dataset that association rules will be mined from.  Each row is treated as a transaction.  Seems to work 
+#' OK when a the S4 transactions class from \code{arules} is used, however this is not thoroughly tested.
 #' @param bin logical, \code{TRUE} will automatically discretize/bin numerical data into categorical features that can be used for association analysis.
-#' @param vars integer, how many variables to include in initial rule mining 
+#' @param vars integer, how many variables to include in initial rule mining
+#' @param supp numeric, the support parameter for initializing visualization.  Useful when it is known that a high support is needed to not crash computationally.
+#' @param conf numeric, the confidence parameter for initializing visualization.  Similarly useful when it is known that a high confidence is needed to not crash computationally.
 #' @seealso \code{arulesViz}, \code{arules}
 #' @return Shiny App
 #' @import shiny arulesViz arules
@@ -32,11 +35,11 @@
 #' ## calling Shiny App to visualize association rules
 #' arulesApp(d)
 
-arulesApp <- function (dataset, bin=T, vars=5) {
+arulesApp <- function (dataset, bin=T, vars=5, supp=0.1, conf=0.5) {
   
   ## binning numeric data
   for(i in 1:ncol(dataset)) {
-    if(class(dataset[,i]) %in% c('numeric', 'integer')) dataset[,i] <- depthbin(dataset[,i], nbins=10)
+    if(class(dataset[,i]) %in% c('numeric', 'integer')) dataset[,i] <- Rsenal::depthbin(dataset[,i], nbins=10)
   }
   
   ## calling Shiny App
@@ -75,8 +78,8 @@ arulesApp <- function (dataset, bin=T, vars=5) {
         condition = "input.mytab %in%' c('grouped', 'graph', 'table', 'datatable', 'scatter', 'paracoord', 'matrix', 'itemFreq')", 
         radioButtons('samp', label='Sample', choices=c('All Rules', 'Sample'), inline=T), br(),
         uiOutput("choose_columns"), br(),
-        sliderInput("supp", "Support:", min = 0, max = 1, value = 0.1 , step = 1/10000), br(),
-        sliderInput("conf", "Confidence:", min = 0, max = 1, value = 0.5 , step = 1/10000), br(),
+        sliderInput("supp", "Support:", min = 0, max = 1, value = supp , step = 1/10000), br(),
+        sliderInput("conf", "Confidence:", min = 0, max = 1, value = conf , step = 1/10000), br(),
         selectInput('sort', label='Sorting Criteria:', choices = c('lift', 'confidence', 'support')), br(), br(),
         numericInput("minL", "Min. items per set:", 2), br(), 
         numericInput("maxL", "Max. items per set::", 3), br(),
@@ -160,14 +163,14 @@ arulesApp <- function (dataset, bin=T, vars=5) {
        } else {
          ar <- arAll
        }
-       quality(ar)$conviction <- interestMeasure(ar, method='conviction', transactions=tr)
-       quality(ar)$hyperConfidence <- interestMeasure(ar, method='hyperConfidence', transactions=tr)
-       quality(ar)$cosine <- interestMeasure(ar, method='cosine', transactions=tr)
-       quality(ar)$chiSquare <- interestMeasure(ar, method='chiSquare', transactions=tr)
-       quality(ar)$coverage <- interestMeasure(ar, method='coverage', transactions=tr)
-       quality(ar)$doc <- interestMeasure(ar, method='doc', transactions=tr)
-       quality(ar)$gini <- interestMeasure(ar, method='gini', transactions=tr)
-       quality(ar)$hyperLift <- interestMeasure(ar, method='hyperLift', transactions=tr)
+       quality(ar)$conviction <- interestMeasure(ar, measure='conviction', transactions=tr)
+       quality(ar)$hyperConfidence <- interestMeasure(ar, measure='hyperConfidence', transactions=tr)
+       quality(ar)$cosine <- interestMeasure(ar, measure='cosine', transactions=tr)
+       quality(ar)$chiSquare <- interestMeasure(ar, measure='chiSquare', transactions=tr)
+       quality(ar)$coverage <- interestMeasure(ar, measure='coverage', transactions=tr)
+       quality(ar)$doc <- interestMeasure(ar, measure='doc', transactions=tr)
+       quality(ar)$gini <- interestMeasure(ar, measure='gini', transactions=tr)
+       quality(ar)$hyperLift <- interestMeasure(ar, measure='hyperLift', transactions=tr)
        ar
      })
      
