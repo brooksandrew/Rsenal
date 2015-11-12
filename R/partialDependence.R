@@ -76,6 +76,8 @@ partialDep <- function(model, df, xvar, n=10, target.class='1', ci=c(.9,.5,.3)) 
 #' 
 #' @examples
 #' library('randomForest')
+#' library('data.table')
+#' library('ggplot2')
 #' DF <- mtcars
 #' DF$vs <- factor(DF$vs)
 #' rf <- randomForest(vs~mpg+cyl+drat+qsec+disp+gear+carb+hp, DF, ntrees=100)
@@ -126,13 +128,5 @@ partialDepAll <- function(model, df, n=10, xvars=NULL, target.class='1', ci=c(.7
     return(retL)
   }
 }
-
-library('randomForest')
-library('data.table')
-library('ggplot2')
-DF <- mtcars
-DF$vs <- factor(DF$vs)
-rf <- randomForest(vs~mpg+cyl+drat+qsec+disp+gear+carb+hp, DF, ntrees=100)
-pda <- partialDepAll(model=rf, df=DF, n=10, xvars=c( 'mpg', 'cyl', 'qsec',  'drat'), ci=0.5)
 
 
