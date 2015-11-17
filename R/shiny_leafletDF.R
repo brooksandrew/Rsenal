@@ -9,7 +9,7 @@
 #' of this vector are the column names of the columns in \code{data} with the lat and lon data.
 #' @seealso \code{leaflet}, \code{shiny}
 #' @return Shiny App
-#' @import shiny leaflet data.table RColorBrewer
+#' @import shiny leaflet data.table RColorBrewer htmlwidgets
 #' @export
 #' 
 #' @examples
@@ -45,7 +45,8 @@ leafletMapDF <- function (data, vars=c('lon'='longitude', 'lat'='latitude')) {
       if(length(uivars)>=4) selectInput('ui4', label=sprintf('Filter by %s:', uivars[4]), choices=as.character(unique(data[[uivars[4]]])), multiple=T),
       h3('Map parameters'),
       selectInput('colby', 'Color by', uivars),
-      numericInput('radiusid', 'Circle radius (meters)', min=1, max=100000, value=10)
+      numericInput('radiusid', 'Circle radius (meters)', min=1, max=100000, value=10),
+      downloadButton('downloadid', 'Save as HTML')
     )),
     
     server = function(input, output) {
@@ -61,17 +62,36 @@ leafletMapDF <- function (data, vars=c('lon'='longitude', 'lat'='latitude')) {
         data[cond,]
       })
       
-      # Actually plotting the leaflet map
-      output$mymap <- renderLeaflet({
+      # Map plot function ############################
+      makemap <- function() {
         tmp <- datar()
-        leaflet() %>%
+        xvec <- factor(tmp[[input$colby]])
+        legcols <- col_vector[1:length(levels(xvec))]
+        leglabs <- levels(xvec)
+        
+        m <- leaflet() %>%
           addProviderTiles("Stamen.TonerLite", options=providerTileOptions(noWrap = TRUE)
           ) %>%
           addCircles(data=cbind(tmp[[vars['lon']]], tmp[[vars['lat']]]), 
                      color=col_vector[as.numeric(factor(tmp[[input$colby]]))],
-                     radius=input[['radiusid']]
-          )
+                     radius=input[['radiusid']]) %>%
+          addLegend("topright", colors=legcols, labels=leglabs, opacity=2, title=input$colby)
+        return(m)
+      }
+      
+      ## Render map ###################################
+      output$mymap <- renderLeaflet({
+        mm <- makemap()
+        #saveWidget(mm, 'leafletmap.html') # this will save on each render without browser directory choice
+        mm
       })
+      
+      ## Download map as HTML  ########################
+      output$downloadid <- downloadHandler(
+        filename = function() 'leafletdownload.html',
+        content = function(con) saveWidget(makemap(), con)
+      )
+    
     }
     
   )}
