@@ -163,14 +163,14 @@ arulesApp <- function (dataset, bin=T, vars=5, supp=0.1, conf=0.5) {
        } else {
          ar <- arAll
        }
-       quality(ar)$conviction <- interestMeasure(ar, method='conviction', transactions=tr)
-       quality(ar)$hyperConfidence <- interestMeasure(ar, method='hyperConfidence', transactions=tr)
-       quality(ar)$cosine <- interestMeasure(ar, method='cosine', transactions=tr)
-       quality(ar)$chiSquare <- interestMeasure(ar, method='chiSquare', transactions=tr)
-       quality(ar)$coverage <- interestMeasure(ar, method='coverage', transactions=tr)
-       quality(ar)$doc <- interestMeasure(ar, method='doc', transactions=tr)
-       quality(ar)$gini <- interestMeasure(ar, method='gini', transactions=tr)
-       quality(ar)$hyperLift <- interestMeasure(ar, method='hyperLift', transactions=tr)
+       quality(ar)$conviction <- interestMeasure(ar, 'conviction', transactions=tr)
+       quality(ar)$hyperConfidence <- interestMeasure(ar, 'hyperConfidence', transactions=tr)
+       quality(ar)$cosine <- interestMeasure(ar, 'cosine', transactions=tr)
+       quality(ar)$chiSquare <- interestMeasure(ar, 'chiSquare', transactions=tr)
+       quality(ar)$coverage <- interestMeasure(ar, 'coverage', transactions=tr)
+       quality(ar)$doc <- interestMeasure(ar, 'doc', transactions=tr)
+       quality(ar)$gini <- interestMeasure(ar, 'gini', transactions=tr)
+       quality(ar)$hyperLift <- interestMeasure(ar, 'hyperLift', transactions=tr)
        ar
      })
      
